@@ -1,7 +1,7 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Anthropic from '@anthropic-ai/sdk';
 import { formatSnapshotForAI, checkNudgeTriggers } from './context.js';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // Build system prompt for a user
 function buildSystemPrompt(snapshot) {
@@ -48,28 +48,29 @@ export async function chat(snapshot, message, history = []) {
   }));
 
   try {
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
-      systemInstruction: systemPrompt
-    });
+    const claudeHistory = history.map(msg => ({
+      role: msg.role === 'assistant' ? 'assistant' : 'user',
+      content: msg.content,
+    }));
 
-    const chatSession = model.startChat({
-      history: geminiHistory
+    const msg = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 300,
+      system: systemPrompt,
+      messages: [...claudeHistory, { role: 'user', content: message }],
     });
-
-    const result = await chatSession.sendMessage(message);
-    const reply = result.response.text();
+    const reply = msg.content[0].text;
 
     return {
       reply,
       updatedHistory: [
         ...history,
         { role: 'user', content: message },
-        { role: 'assistant', content: reply }
-      ]
+        { role: 'assistant', content: reply },
+      ],
     };
   } catch (error) {
-    console.error('Gemini API error:', error);
+    console.error('Claude API error:', error);
     throw error;
   }
 }
@@ -86,16 +87,13 @@ export async function generateNudge(snapshot) {
   const triggerText = triggers.map(t => t.message).join('; ');
 
   try {
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
-      systemInstruction: systemPrompt
+    const msg = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 100,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: `Generate a short proactive nudge (max 2 sentences) for this user based on these triggers: ${triggerText}. Be direct and match the tone for this user.` }],
     });
-
-    const result = await model.generateContent(
-      `Generate a short proactive nudge (max 2 sentences) for this user based on these triggers: ${triggerText}. Be direct and match the tone for this user.`
-    );
-
-    return result.response.text();
+    return msg.content[0].text;
   } catch (error) {
     console.error('Nudge generation error:', error);
     return null;
@@ -107,16 +105,13 @@ export async function generateRecap(snapshot) {
   const systemPrompt = buildSystemPrompt(snapshot);
 
   try {
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
-      systemInstruction: systemPrompt
+    const msg = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 200,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: `Write a brief weekly financial recap for this user (3-4 sentences). Highlight wins, concerns, and one actionable tip. Match the tone for this user.` }],
     });
-
-    const result = await model.generateContent(
-      `Write a brief weekly financial recap for this user (3-4 sentences). Highlight wins, concerns, and one actionable tip. Match the tone for this user.`
-    );
-
-    return result.response.text();
+    return msg.content[0].text;
   } catch (error) {
     console.error('Recap generation error:', error);
     return null;

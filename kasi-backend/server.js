@@ -5,7 +5,7 @@ import db from './db.js';
 import { getFinancialSnapshot } from './context.js';
 import { setSimulatedLocation, checkUserLocation } from './location-notification.js';
 
-dotenv.config();
+dotenv.config({ path: '../.env.local' });
 
 const app = express();
 const PORT = process.env.PORT || 3001;

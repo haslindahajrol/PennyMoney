@@ -4,10 +4,10 @@
 // ============================================================
 
 import { getFinancialSnapshot } from './context.js';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Anthropic from '@anthropic-ai/sdk';
 import db from './db.js';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // ============================================================
 // CONSTANTS
@@ -69,11 +69,14 @@ Safe to spend: ${rmLeft}${healthLine}
 Write EXACTLY 2 short lines (like a phone notification). Line 1: one punchy hook referencing their goal or weakness. Line 2: their safe-to-spend figure + one concrete action. No hashtags. No emojis unless it helps. Under 20 words total.`;
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    const result = await model.generateContent(prompt);
-    return result.response.text().trim();
+    const msg = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 60,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    return msg.content[0].text.trim();
   } catch (err) {
-    console.error('[LocationNudge] Gemini error:', err);
+    console.error('[LocationNudge] Claude error:', err);
     return `${user.saving_goal}: ${goalProgress}.\nYou have ${rmLeft} — spend with that in mind.`;
   }
 }
