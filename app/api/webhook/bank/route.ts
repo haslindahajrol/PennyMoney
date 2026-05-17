@@ -34,20 +34,25 @@ export async function POST(req: Request) {
     if (!exists) {
       db.transactions = db.transactions ?? [];
       db.transactions.unshift({
-        id:       transaction.id,
-        user_id:  transaction.user_id,
-        date:     transaction.date,
-        merchant: transaction.merchant,
-        amount:   transaction.amount,
-        category: transaction.category ?? "other",
-        type:     transaction.type ?? "debit",
+        id:         transaction.id,
+        user_id:    transaction.user_id,
+        date:       transaction.date,
+        merchant:   transaction.merchant,
+        amount:     transaction.amount,
+        category:   transaction.category ?? "other",
+        type:       transaction.type ?? "debit",
+        created_at: transaction.created_at ?? new Date().toISOString(),
       });
     }
 
-    // Update account balance
+    // Update account balance and recalculate safe_to_spend
     const account = db.accounts?.find((a: { user_id: string }) => a.user_id === transaction.user_id);
     if (account && data.account?.balance !== undefined) {
       account.balance = data.account.balance;
+      const today = new Date().toISOString().split("T")[0];
+      const bills = (db.bills ?? []).filter((b: { user_id: string; due_date: string }) => b.user_id === transaction.user_id && b.due_date >= today);
+      const totalBills = bills.reduce((sum: number, b: { amount: number }) => sum + b.amount, 0);
+      account.safe_to_spend = Math.max(0, parseFloat((account.balance - totalBills).toFixed(2)));
     }
 
     // Grant "Me First!" achievement when Shoko spends on food
@@ -68,8 +73,12 @@ export async function POST(req: Request) {
     const account = db.accounts?.find((a: { user_id: string }) => a.user_id === user_id);
     if (account) {
       account.balance = new_balance;
+      const today = new Date().toISOString().split("T")[0];
+      const bills = (db.bills ?? []).filter((b: { user_id: string; due_date: string }) => b.user_id === user_id && b.due_date >= today);
+      const totalBills = bills.reduce((sum: number, b: { amount: number }) => sum + b.amount, 0);
+      account.safe_to_spend = Math.max(0, parseFloat((new_balance - totalBills).toFixed(2)));
       writeDb(db);
-      console.log(`[WEBHOOK] Balance updated: ${user_id} → RM${new_balance}`);
+      console.log(`[WEBHOOK] Balance updated: ${user_id} → RM${new_balance}, safe_to_spend → RM${account.safe_to_spend}`);
     }
   }
 

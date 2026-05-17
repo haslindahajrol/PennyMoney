@@ -14,8 +14,8 @@
       "kasi_tone": "Warm and non-judgmental. She's not reckless - she's adjusting. Don't shame her. Show her the numbers plainly and suggest one concrete swap at a time. Example: point out that her monthly Grab spend alone could cover her grocery bill.",
       "home_lat": 3.0838,
       "home_lng": 101.7471,
-      "live_lat": 3.1488,
-      "live_lng": 101.7133
+      "live_lat": 3.0838,
+      "live_lng": 101.7471
     },
     {
       "id": "user_002",
@@ -86,14 +86,14 @@
     {
       "id": "acc_003",
       "user_id": "user_003",
-      "balance": 980,
-      "safe_to_spend": 130
+      "balance": 974,
+      "safe_to_spend": 974
     },
     {
       "id": "acc_004",
       "user_id": "user_004",
-      "balance": 291,
-      "safe_to_spend": 47
+      "balance": 276,
+      "safe_to_spend": 264
     }
   ],
   "income": [
@@ -211,6 +211,26 @@
     }
   ],
   "transactions": [
+    {
+      "id": "txn_1779034485753_hloa",
+      "user_id": "user_003",
+      "date": "2026-05-17",
+      "merchant": "Chatime",
+      "amount": 6,
+      "category": "food",
+      "type": "debit",
+      "created_at": "2026-05-17T16:14:45.753Z"
+    },
+    {
+      "id": "txn_1779033966085_cpc2",
+      "user_id": "user_004",
+      "date": "2026-05-17",
+      "merchant": "Foodfrff",
+      "amount": 15,
+      "category": "food",
+      "type": "debit",
+      "created_at": "2026-05-17T16:06:06.085Z"
+    },
     {
       "id": "txn_1779020218255_2h4m",
       "user_id": "user_004",
@@ -3637,6 +3657,14 @@
       "name": "Rapidbus pass",
       "amount": 30,
       "due_date": "2024-02-01",
+      "recurring": true
+    },
+    {
+      "id": "bill_1779033426323",
+      "user_id": "user_004",
+      "name": "YouTube Premium",
+      "amount": 12,
+      "due_date": "2026-05-20",
       "recurring": true
     }
   ],

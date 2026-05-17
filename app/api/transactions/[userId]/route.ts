@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import fs from "fs";
+import path from "path";
 
-const KASI_URL = process.env.KASI_URL || "http://localhost:3001";
+const DB_PATH = path.join(process.cwd(), "kasi-backend", "db.json");
 
 export async function GET(
   _req: Request,
@@ -8,11 +10,15 @@ export async function GET(
 ) {
   const { userId } = await params;
   try {
-    const res = await fetch(`${KASI_URL}/transactions/${userId}`);
-    if (!res.ok) return NextResponse.json([], { status: 200 });
-    const txns = await res.json();
-    txns.sort((a: { date: string }, b: { date: string }) => b.date.localeCompare(a.date));
-    return NextResponse.json(txns);
+    const db = JSON.parse(fs.readFileSync(DB_PATH, "utf-8"));
+    const txns = (db.transactions ?? [])
+      .filter((t: { user_id: string }) => t.user_id === userId)
+      .sort((a: { date: string; created_at?: string }, b: { date: string; created_at?: string }) => {
+        const aTime = a.created_at ?? a.date;
+        const bTime = b.created_at ?? b.date;
+        return bTime.localeCompare(aTime);
+      });
+    return NextResponse.json(txns, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return NextResponse.json([], { status: 200 });
   }

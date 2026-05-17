@@ -49,7 +49,6 @@ const TEST_USERS = [
   {
     id: "user_001",
     name: "Mei Ling",
-    avatar: "/mei-ling.jpg",
     role: "Full-time employee",
     balance: 1800,
     available: 700,
@@ -63,7 +62,6 @@ const TEST_USERS = [
   {
     id: "user_002",
     name: "Jason",
-    avatar: "/jason.jpg",
     role: "Full-time employee",
     balance: 3140,
     available: 480,
@@ -78,7 +76,6 @@ const TEST_USERS = [
   {
     id: "user_003",
     name: "Hakim",
-    avatar: "/hakim.jpg",
     role: "Freelancer, variable income",
     balance: 980,
     available: 130,
@@ -92,7 +89,6 @@ const TEST_USERS = [
   {
     id: "user_004",
     name: "Shoko",
-    avatar: "/shoko.jpg",
     role: "Full-time employee",
     balance: 312,
     available: 47,
@@ -203,8 +199,8 @@ function LoginScreen({ onSelect }: { onSelect: (user: (typeof TEST_USERS)[0]) =>
     <div className="flex flex-col flex-1 bg-[#F7F9EE]">
       {/* Header */}
       <div className="bg-gradient-to-b from-[#7AAD47] to-[#5D8733] rounded-b-3xl px-6 pt-14 pb-10 flex flex-col items-center">
-        <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mb-4">
-          <Wallet size={28} className="text-white" />
+        <div className="w-16 h-16 rounded-full overflow-hidden mb-4 bg-white/20">
+          <img src="/PennyLogo.jpeg" alt="Penny" className="w-full h-full object-cover" />
         </div>
         <h1 className="text-white text-2xl font-bold">Penny</h1>
         <p className="text-white/80 text-sm mt-1">Tap an account to get started</p>
@@ -220,17 +216,8 @@ function LoginScreen({ onSelect }: { onSelect: (user: (typeof TEST_USERS)[0]) =>
               className="w-full text-left p-4 rounded-2xl border border-[#C8E0A8] bg-white hover:border-[#5D8733] hover:bg-[#5D8733]/5 active:scale-[0.98] transition-all"
             >
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#EEF3E3] flex items-center justify-center flex-shrink-0 mt-0.5 overflow-hidden">
-                  <img
-                    src={user.avatar}
-                    alt={user.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none";
-                      e.currentTarget.nextElementSibling?.removeAttribute("style");
-                    }}
-                  />
-                  <span style={{ display: "none" }} className="text-[#748A68] text-sm font-bold">{user.name[0]}</span>
+                <div className="w-10 h-10 rounded-full bg-[#EEF3E3] flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <User size={18} className="text-[#748A68]" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
@@ -415,7 +402,7 @@ function HomeScreen({
         .then((data) => {
           if (data?.balance !== undefined) setLiveBalance(data.balance);
         });
-    }, 10000);
+    }, 3000);
     return () => clearInterval(interval);
   }, [user.id]);
 
@@ -470,7 +457,10 @@ function HomeScreen({
           <div className="flex-1">
             <p className="text-amber-800 text-sm font-semibold">Heads up, {user.name.split(" ")[0]}!</p>
             <p className="text-amber-700 text-xs mt-0.5">
-              {aiNudge ?? <>Near <span className="font-semibold">{nearbyMall.name}</span> — you have <span className="font-semibold">{fmt(Math.max(0, (liveBalance ?? user.balance) - user.savings))}</span> safe to spend.</>}
+              {aiNudge ?? (
+                <>You&apos;re near <span className="font-semibold">{nearbyMall.name}</span>. Your safe-to-spend is{" "}
+                <span className="font-semibold">{fmt(liveBalance ?? user.available)}</span> — stay mindful!</>
+              )}
             </p>
           </div>
           <button onClick={() => { setAlertDismissed(true); setAiNudge(null); }} className="text-amber-400 hover:text-amber-600 text-lg leading-none">✕</button>
@@ -486,24 +476,17 @@ function HomeScreen({
           <button onClick={onLogout} className="w-9 h-9 rounded-full bg-[#EEF3E3] flex items-center justify-center">
             <LogOut size={16} className="text-[#748A68]" />
           </button>
-          <div className="w-9 h-9 rounded-full bg-[#5D8733] flex items-center justify-center overflow-hidden">
-            <img
-              src={user.avatar}
-              alt={user.name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-                e.currentTarget.nextElementSibling?.removeAttribute("style");
-              }}
-            />
-            <span style={{ display: "none" }} className="text-white text-sm font-bold">{user.name[0]}</span>
+          <div className="w-9 h-9 rounded-full bg-[#5D8733] flex items-center justify-center">
+            <span className="text-white text-sm font-bold">{user.name[0]}</span>
           </div>
         </div>
       </div>
 
       {/* Achievement Badges */}
       {earnedAchievements.length > 0 && (
-        <div className="bg-white border border-[#C8E0A8] rounded-2xl p-4">
+        <div className="relative pt-8">
+          <img src="/PennyChampion.jpeg" alt="" className="absolute top-0 right-3 w-14 h-14 object-cover rounded-full z-10" />
+          <div className="bg-white border border-[#C8E0A8] rounded-2xl p-4">
           <p className="text-[#748A68] text-xs uppercase tracking-wider mb-3">Achievements</p>
           <div className="flex gap-4 flex-wrap">
             {earnedAchievements.map((ach) => (
@@ -514,6 +497,7 @@ function HomeScreen({
                 <span className="text-[#1B2A16] text-[10px] font-semibold text-center leading-tight max-w-[56px]">{ach.name}</span>
               </div>
             ))}
+          </div>
           </div>
         </div>
       )}
@@ -660,6 +644,10 @@ function HomeScreen({
             <span className="text-sm">🎟️</span>
             <span className="text-[#1B2A16] font-semibold text-sm">My Vouchers</span>
           </div>
+          <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-3 py-2 mb-3">
+            <img src="/PennyVoucher.jpeg" alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+            <span className="text-green-700 text-xs font-semibold">Spend wisely and unlock great rewards!</span>
+          </div>
           <div className="space-y-3">
             {earnedAchievements.map((ach) => (
               <div key={ach.id} className="bg-[#EEF3E3] border border-dashed border-[#5D8733] rounded-xl p-3">
@@ -704,7 +692,7 @@ function WalletScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
       fetch(`/api/accounts/${user.id}`)
         .then((r) => r.json())
         .then((data) => { if (data?.balance !== undefined) setLiveBalance(data.balance); });
-    }, 10000);
+    }, 3000);
     return () => clearInterval(interval);
   }, [user.id]);
 
@@ -832,8 +820,8 @@ function ChatScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
     <div className="flex-1 flex flex-col bg-[#F7F9EE] overflow-hidden">
       {/* Header */}
       <div className="px-4 pt-6 pb-4 flex items-center gap-3 border-b border-[#C8E0A8] bg-white">
-        <div className="w-10 h-10 rounded-full bg-[#5D8733] flex items-center justify-center">
-          <MessageSquare size={18} className="text-white" />
+        <div className="w-10 h-10 rounded-full overflow-hidden">
+          <img src="/PennyPfpChat.jpeg" alt="Penny" className="w-full h-full object-cover" />
         </div>
         <div>
           <p className="text-[#1B2A16] font-semibold">Penny</p>
@@ -848,8 +836,8 @@ function ChatScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {/* Greeting */}
         <div className="flex gap-3">
-          <div className="w-8 h-8 rounded-full bg-[#EEF3E3] border border-[#C8E0A8] flex items-center justify-center flex-shrink-0">
-            <span className="text-[#5D8733] text-xs font-bold">P</span>
+          <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 border border-[#C8E0A8]">
+            <img src="/PennyPfpChat.jpeg" alt="Penny" className="w-full h-full object-cover" />
           </div>
           <div className="bg-white border border-[#C8E0A8] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[78%]">
             <p className="text-[#1B2A16] text-sm">
@@ -862,8 +850,8 @@ function ChatScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
             {msg.role === "ai" && (
-              <div className="w-8 h-8 rounded-full bg-[#EEF3E3] border border-[#C8E0A8] flex items-center justify-center flex-shrink-0">
-                <span className="text-[#5D8733] text-xs font-bold">P</span>
+              <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 border border-[#C8E0A8]">
+                <img src="/PennyPfpChat.jpeg" alt="Penny" className="w-full h-full object-cover" />
               </div>
             )}
             <div
@@ -881,8 +869,8 @@ function ChatScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
         {/* Typing indicator */}
         {isLoading && (
           <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#EEF3E3] border border-[#C8E0A8] flex items-center justify-center flex-shrink-0">
-              <span className="text-[#5D8733] text-xs font-bold">P</span>
+            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 border border-[#C8E0A8]">
+              <img src="/PennyPfpChat.jpeg" alt="Penny" className="w-full h-full object-cover" />
             </div>
             <div className="bg-white border border-[#C8E0A8] rounded-2xl rounded-tl-sm px-4 py-3.5">
               <div className="flex gap-1.5 items-center">
@@ -1266,17 +1254,8 @@ function ProfileScreen({
 
       {/* User Card */}
       <div className="bg-white border border-[#C8E0A8] rounded-2xl p-4 flex items-center gap-4">
-        <div className="w-14 h-14 rounded-full bg-[#5D8733] flex items-center justify-center overflow-hidden">
-          <img
-            src={user.avatar}
-            alt={user.name}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-              e.currentTarget.nextElementSibling?.removeAttribute("style");
-            }}
-          />
-          <span style={{ display: "none" }} className="text-white text-xl font-bold">{user.name[0]}</span>
+        <div className="w-14 h-14 rounded-full bg-[#5D8733] flex items-center justify-center">
+          <span className="text-white text-xl font-bold">{user.name[0]}</span>
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
@@ -1433,7 +1412,7 @@ function AllTransactionsScreen({
       fetch(`/api/transactions/${user.id}`)
         .then((r) => r.json())
         .then((data) => setTransactions(data));
-    }, 10000);
+    }, 3000);
     return () => clearInterval(interval);
   }, [user.id]);
 
