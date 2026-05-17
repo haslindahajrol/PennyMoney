@@ -1,149 +1,12 @@
-/*import { Low } from 'lowdb';
-import { JSONFile } from 'lowdb/node';
-
-// Default data matching the schema from the spec
-const defaultData = {
-  users: [
-    {
-      id: "user_001",
-      name: "Mei Ling",
-      monthly_income: 2500,
-      income_type: "fixed",
-      payday: 28,
-      personality: "Disciplined, tracks every ringgit, gets uncomfortable overspending even slightly. Loves data and affirmation.",
-      spending_weakness: "Shopee flash sales — tells herself it is a good deal",
-      saving_goal: "Emergency fund",
-      saving_goal_amount: 10000,
-      saving_goal_saved: 6200,
-      kasi_tone: "Encouraging and precise. Celebrate wins. Frame issues as small tweaks."
-    },
-    {
-      id: "user_002",
-      name: "Jason",
-      monthly_income: 6000,
-      income_type: "fixed",
-      payday: 25,
-      personality: "Ambitious and lifestyle-driven. Low-key in denial. Responds better to reality checks than gentle nudges.",
-      spending_weakness: "Restaurants, bars, anything that feels like a flex. Treat-yourself mode has no off switch.",
-      saving_goal: "Europe trip by end of year",
-      saving_goal_amount: 8000,
-      saving_goal_saved: 420,
-      kasi_tone: "Direct and blunt. Use contrast: 'that dinner cost you 2 days of Europe savings.' Do not sugarcoat."
-    },
-    {
-      id: "user_003",
-      name: "Hakim",
-      monthly_income: 2200,
-      income_type: "freelance",
-      payday: null,
-      personality: "Resourceful and adaptable but quietly anxious about uncertainty. Good months feel invincible, bad months spiral. Scrappy, independent, secretly wants structure but will not admit it.",
-      spending_weakness: "Tools, gear, apps, courses — convinces himself every purchase is a business investment",
-      saving_goal: "3-month income buffer",
-      saving_goal_amount: 6000,
-      saving_goal_saved: 1100,
-      kasi_tone: "Grounding and practical. Think in good month vs slow month terms. Remind him a slow month could be next. Celebrate frugality."
-    },
-    {
-      id: "user_004",
-      name: "Shoko",
-      monthly_income: 1300,
-      income_type: "fixed",
-      payday: 1,
-      personality: "Creative and passionate about hobbies. Hesitant and indecisive with money. Overthinks small purchases but impulse-splurges on hobby items. Skips breakfast and dinner to fund hobbies.",
-      spending_weakness: "Manga, art materials, anime merch, craft supplies — rationalises every purchase",
-      saving_goal: "Build a hobby fund so she stops skipping meals",
-      saving_goal_amount: 500,
-      saving_goal_saved: 45,
-      kasi_tone: "Big-sister energy — warm but firm. Call out meal-skipping clearly but without shame. When she hesitates, give one clear recommendation, not more options.",
-      health_flag: "Known to skip breakfast and dinner to fund hobby spending. Food must always be treated as non-negotiable."
-    }
-  ],
-  accounts: [
-    { id: "acc_001", user_id: "user_001", balance: 1820, safe_to_spend: 210 },
-    { id: "acc_002", user_id: "user_002", balance: 3140, safe_to_spend: 480 },
-    { id: "acc_003", user_id: "user_003", balance: 980, safe_to_spend: 130 },
-    { id: "acc_004", user_id: "user_004", balance: 312, safe_to_spend: 47 }
-  ],
-  transactions: [
-    // Mei Ling's transactions
-    { id: "txn_001", user_id: "user_001", date: "2024-01-15", merchant: "Shopee", amount: 132, category: "shopping" },
-    { id: "txn_002", user_id: "user_001", date: "2024-01-14", merchant: "Grab Food", amount: 18, category: "food" },
-    { id: "txn_003", user_id: "user_001", date: "2024-01-13", merchant: "Watsons", amount: 45, category: "personal" },
-    
-    // Jason's transactions
-    { id: "txn_004", user_id: "user_002", date: "2024-01-15", merchant: "Nobu KL", amount: 380, category: "dining" },
-    { id: "txn_005", user_id: "user_002", date: "2024-01-14", merchant: "Pavilion", amount: 260, category: "shopping" },
-    { id: "txn_006", user_id: "user_002", date: "2024-01-13", merchant: "Marini's on 57", amount: 185, category: "entertainment" },
-    
-    // Hakim's transactions
-    { id: "txn_007", user_id: "user_003", date: "2024-01-15", merchant: "Logitech", amount: 340, category: "work_tools" },
-    { id: "txn_008", user_id: "user_003", date: "2024-01-12", merchant: "Udemy", amount: 89, category: "work_tools" },
-    { id: "txn_009", user_id: "user_003", date: "2024-01-10", merchant: "Adobe", amount: 52, category: "subscriptions" },
-    
-    // Shoko's transactions
-    { id: "txn_010", user_id: "user_004", date: "2024-01-15", merchant: "Kinokuniya", amount: 189, category: "hobbies" },
-    { id: "txn_011", user_id: "user_004", date: "2024-01-13", merchant: "Art Friend", amount: 145, category: "hobbies" },
-    { id: "txn_012", user_id: "user_004", date: "2024-01-11", merchant: "Mamak", amount: 6, category: "food" },
-    { id: "txn_013", user_id: "user_004", date: "2024-01-09", merchant: "Anime Store", amount: 64, category: "hobbies" },
-    { id: "txn_014", user_id: "user_004", date: "2024-01-05", merchant: "7-Eleven", amount: 20, category: "food" }
-  ],
-  bills: [
-    // Mei Ling's bills
-    { id: "bill_001", user_id: "user_001", name: "Room rental", amount: 300, due_date: "2024-02-01", recurring: true },
-    
-    // Jason's bills
-    { id: "bill_002", user_id: "user_002", name: "Studio rental", amount: 700, due_date: "2024-02-01", recurring: true },
-    { id: "bill_003", user_id: "user_002", name: "Credit card", amount: 500, due_date: "2024-01-25", recurring: true },
-    { id: "bill_004", user_id: "user_002", name: "Car loan", amount: 650, due_date: "2024-01-28", recurring: true },
-    
-    // Hakim's bills
-    { id: "bill_005", user_id: "user_003", name: "Room rental", amount: 300, due_date: "2024-02-01", recurring: true },
-    { id: "bill_006", user_id: "user_003", name: "Coworking workspace", amount: 200, due_date: "2024-01-17", recurring: true },
-    
-    // Shoko's bills
-    { id: "bill_007", user_id: "user_004", name: "University dorm", amount: 400, due_date: "2024-02-01", recurring: true },
-    { id: "bill_008", user_id: "user_004", name: "Rapidbus pass", amount: 30, due_date: "2024-02-01", recurring: true }
-  ],
-  budgets: [
-    // Mei Ling's budgets
-    { user_id: "user_001", category: "food", limit: 300 },
-    { user_id: "user_001", category: "shopping", limit: 100 },
-    { user_id: "user_001", category: "transport", limit: 100 },
-    
-    // Jason's budgets
-    { user_id: "user_002", category: "dining", limit: 200 },
-    { user_id: "user_002", category: "shopping", limit: 200 },
-    { user_id: "user_002", category: "entertainment", limit: 150 },
-    
-    // Hakim's budgets
-    { user_id: "user_003", category: "work_tools", limit: 100 },
-    { user_id: "user_003", category: "subscriptions", limit: 100 },
-    { user_id: "user_003", category: "food", limit: 250 },
-    
-    // Shoko's budgets
-    { user_id: "user_004", category: "hobbies", limit: 80 },
-    { user_id: "user_004", category: "food", limit: 400 },
-    { user_id: "user_004", category: "transport", limit: 50 }
-  ]
-};
-
-// Initialize database
-const adapter = new JSONFile('db.json');
-const db = new Low(adapter, defaultData);
-
-// Initialize db on first run
-await db.read();
-if (!db.data) {
-  db.data = defaultData;
-  await db.write();
-}
-
-export default db;
-*/
-
 import { Low } from 'lowdb';
 import { JSONFile } from 'lowdb/node';
 
+// BEHAVIORAL ARCS:
+// Mei Ling  - Lifestyle creep, no improvement. Grab/Village Grocer/Starbucks/beauty hauls every month.
+// Jason     - Chronic denial. High earner who outspends income. Dec = worst (year-end YOLO). No improvement.
+// Hakim     - Freelance boom-bust. Dec income crashed to RM 1,100 -> forced frugality. Jan recovering but slipping.
+// Shoko     - Payday hobby binge -> meal skipping. Dec = best month (proved she can). Jan = full regression.
+
 const defaultData = {
   users: [
     {
@@ -152,12 +15,12 @@ const defaultData = {
       monthly_income: 2500,
       income_type: "fixed",
       payday: 28,
-      personality: "Disciplined, tracks every ringgit, gets uncomfortable overspending even slightly. Loves data and affirmation.",
-      spending_weakness: "Shopee flash sales — tells herself it is a good deal",
+      personality: "Grew up in a well-off family where money was never a concern. Now living independently on RM 2,500 salary but hasn't adjusted her lifestyle downward. Doesn't feel like she's overspending because she never had to think about it before. Avoids checking her balance - not out of irresponsibility, but because money stress is unfamiliar.",
+      spending_weakness: "Grab for every single trip instead of public transport. Village Grocer over the pasar or Aeon. Starbucks as a daily ritual. Monthly beauty and skincare hauls. Food delivery instead of cooking. None of it feels extravagant to her - it's just how she's always lived.",
       saving_goal: "Emergency fund",
       saving_goal_amount: 10000,
-      saving_goal_saved: 6200,
-      kasi_tone: "Encouraging and precise. Celebrate wins. Frame issues as small tweaks."
+      saving_goal_saved: 1200,
+      kasi_tone: "Warm and non-judgmental. She's not reckless - she's adjusting. Don't shame her. Show her the numbers plainly and suggest one concrete swap at a time. Example: point out that her monthly Grab spend alone could cover her grocery bill."
     },
     {
       id: "user_002",
@@ -165,12 +28,12 @@ const defaultData = {
       monthly_income: 6000,
       income_type: "fixed",
       payday: 25,
-      personality: "Ambitious and lifestyle-driven. Low-key in denial. Responds better to reality checks than gentle nudges.",
-      spending_weakness: "Restaurants, bars, anything that feels like a flex. Treat-yourself mode has no off switch.",
+      personality: "Ambitious senior executive, lifestyle-driven, low-key in denial about his financial situation. Believes he deserves the finer things because he works hard. Responds to stark contrasts and cold hard numbers, not gentle nudges. Tells himself he'll save 'next month' every month.",
+      spending_weakness: "Fine dining, rooftop bars, luxury shopping. Treat-yourself mode is permanently on. Weekend spending is 3x his weekday average. Payday triggers an immediate lifestyle flex.",
       saving_goal: "Europe trip by end of year",
       saving_goal_amount: 8000,
       saving_goal_saved: 420,
-      kasi_tone: "Direct and blunt. Use contrast: 'that dinner cost you 2 days of Europe savings.' Do not sugarcoat."
+      kasi_tone: "Direct and blunt. Use contrast and cold math: 'that one dinner = 6 days of Europe savings.' No sugarcoating. He responds to reality checks, not encouragement."
     },
     {
       id: "user_003",
@@ -178,12 +41,12 @@ const defaultData = {
       monthly_income: 2200,
       income_type: "freelance",
       payday: null,
-      personality: "Resourceful and adaptable but quietly anxious about uncertainty. Good months feel invincible, bad months spiral. Scrappy, independent, secretly wants structure but will not admit it.",
-      spending_weakness: "Tools, gear, apps, courses — convinces himself every purchase is a business investment",
+      personality: "Freelance designer with variable income. Good months make him feel invincible; slow months trigger quiet anxiety and frugality. Secretly craves financial structure but won't admit it. Resourceful and scrappy when he has to be.",
+      spending_weakness: "Tools, gear, software, courses - always framed as business investments. When income is good he convinces himself every purchase is justified. The pattern repeats every good month.",
       saving_goal: "3-month income buffer",
       saving_goal_amount: 6000,
       saving_goal_saved: 1100,
-      kasi_tone: "Grounding and practical. Think in good month vs slow month terms. Remind him a slow month could be next. Celebrate frugality."
+      kasi_tone: "Grounding and practical. Frame everything in good-month vs slow-month terms. Remind him December happened. Celebrate when he holds back - that frugality muscle is real and worth affirming."
     },
     {
       id: "user_004",
@@ -191,209 +54,543 @@ const defaultData = {
       monthly_income: 1300,
       income_type: "fixed",
       payday: 1,
-      personality: "Creative and passionate about hobbies. Hesitant and indecisive with money. Overthinks small purchases but impulse-splurges on hobby items. Skips breakfast and dinner to fund hobbies.",
-      spending_weakness: "Manga, art materials, anime merch, craft supplies — rationalises every purchase",
+      personality: "University student, creative and passionate about her hobbies. Indecisive with small purchases but impulsive with hobby items. Skips meals to fund manga and art supplies without fully registering she's doing it. Had one genuinely good month (December) where she managed herself - which proves she can do it.",
+      spending_weakness: "Manga, anime merch, art supplies, craft kits. Rationalises every purchase. Payday triggers an immediate hobby binge in the first week, which leaves almost nothing for food the rest of the month.",
       saving_goal: "Build a hobby fund so she stops skipping meals",
       saving_goal_amount: 500,
       saving_goal_saved: 45,
-      kasi_tone: "Big-sister energy — warm but firm. Call out meal-skipping clearly but without shame. When she hesitates, give one clear recommendation, not more options.",
-      health_flag: "Known to skip breakfast and dinner to fund hobby spending. Food must always be treated as non-negotiable."
+      kasi_tone: "Big-sister energy - warm but firm. Remind her December existed and she did it once. Call out meal-skipping without shame. One clear recommendation, never more options.",
+      health_flag: "Skips breakfast and dinner to afford hobby purchases. Food is non-negotiable - flag it in every relevant response regardless of what she's asking about."
     }
   ],
 
   accounts: [
     { id: "acc_001", user_id: "user_001", balance: 1820, safe_to_spend: 210 },
     { id: "acc_002", user_id: "user_002", balance: 3140, safe_to_spend: 480 },
-    { id: "acc_003", user_id: "user_003", balance: 980, safe_to_spend: 130 },
-    { id: "acc_004", user_id: "user_004", balance: 312, safe_to_spend: 47 }
+    { id: "acc_003", user_id: "user_003", balance: 980,  safe_to_spend: 130 },
+    { id: "acc_004", user_id: "user_004", balance: 312,  safe_to_spend: 47  }
+  ],
+
+  // Income records per pay period — critical for Hakim's boom-bust arc
+  income: [
+    { id: "inc_ml_oct", user_id: "user_001", date: "2023-10-28", amount: 2500, source: "Salary" },
+    { id: "inc_ml_nov", user_id: "user_001", date: "2023-11-28", amount: 2500, source: "Salary" },
+    { id: "inc_ml_dec", user_id: "user_001", date: "2023-12-28", amount: 2500, source: "Salary" },
+    { id: "inc_ml_jan", user_id: "user_001", date: "2024-01-28", amount: 2500, source: "Salary" },
+
+    { id: "inc_j_oct",  user_id: "user_002", date: "2023-10-25", amount: 6000, source: "Salary" },
+    { id: "inc_j_nov",  user_id: "user_002", date: "2023-11-25", amount: 6000, source: "Salary" },
+    { id: "inc_j_dec",  user_id: "user_002", date: "2023-12-25", amount: 6000, source: "Salary" },
+    { id: "inc_j_jan",  user_id: "user_002", date: "2024-01-25", amount: 6000, source: "Salary" },
+
+    { id: "inc_h_oct",  user_id: "user_003", date: "2023-10-12", amount: 3800, source: "Freelance - large branding project (great month)" },
+    { id: "inc_h_nov",  user_id: "user_003", date: "2023-11-10", amount: 3100, source: "Freelance - two mid-size clients (solid month)" },
+    { id: "inc_h_dec",  user_id: "user_003", date: "2023-12-22", amount: 1100, source: "Freelance - one small gig, slow month" },
+    { id: "inc_h_jan",  user_id: "user_003", date: "2024-01-10", amount: 2200, source: "Freelance - one mid project, recovering" },
+
+    { id: "inc_s_oct",  user_id: "user_004", date: "2023-10-01", amount: 1300, source: "Scholarship RM 800 + Parental Allowance RM 500" },
+    { id: "inc_s_nov",  user_id: "user_004", date: "2023-11-01", amount: 1300, source: "Scholarship RM 800 + Parental Allowance RM 500" },
+    { id: "inc_s_dec",  user_id: "user_004", date: "2023-12-01", amount: 1300, source: "Scholarship RM 800 + Parental Allowance RM 500" },
+    { id: "inc_s_jan",  user_id: "user_004", date: "2024-01-01", amount: 1300, source: "Scholarship RM 800 + Parental Allowance RM 500" }
   ],
 
   transactions: [
 
-    // ─────────────────────────────────────────────
-    // MEI LING (user_001)
-    // Pattern: Payday splurge on Shopee (days 28–30), then disciplined rest of month.
-    // One flash sale slip mid-month. Food and transport always within budget.
-    // ─────────────────────────────────────────────
+    // ─── MEI LING (user_001) ───────────────────────────────────────────────────
+    // Lifestyle creep - no improvement, slight escalation Dec onwards.
+    // Oct: transport~RM310, food~RM480, beauty~RM230, groceries~RM310 = ~RM1,330
+    // Nov: transport~RM330, food~RM490, beauty~RM315, groceries~RM330 = ~RM1,465
+    // Dec: transport~RM380, food~RM560, beauty~RM460, shopping~RM310 = ~RM1,710 (worst)
+    // Jan: same habits continue, no sign of change
 
-    // Last month — payday splurge window (Dec 28–31)
-    { id: "txn_ml_001", user_id: "user_001", date: "2024-12-28", merchant: "Shopee", amount: 78, category: "shopping", note: "payday splurge" },
-    { id: "txn_ml_002", user_id: "user_001", date: "2024-12-29", merchant: "Shopee", amount: 43, category: "shopping", note: "payday splurge" },
-    { id: "txn_ml_003", user_id: "user_001", date: "2024-12-30", merchant: "Grab Food", amount: 22, category: "food" },
-    { id: "txn_ml_004", user_id: "user_001", date: "2024-12-31", merchant: "Watsons", amount: 38, category: "personal" },
+    // OCT 2023
+    { id: "ml_oct_01", user_id: "user_001", date: "2023-10-01", merchant: "Grab",           amount: 22,  category: "transport" },
+    { id: "ml_oct_02", user_id: "user_001", date: "2023-10-01", merchant: "Starbucks",      amount: 24,  category: "food" },
+    { id: "ml_oct_03", user_id: "user_001", date: "2023-10-02", merchant: "Grab Food",      amount: 34,  category: "food" },
+    { id: "ml_oct_04", user_id: "user_001", date: "2023-10-02", merchant: "Grab",           amount: 19,  category: "transport" },
+    { id: "ml_oct_05", user_id: "user_001", date: "2023-10-03", merchant: "Village Grocer", amount: 118, category: "groceries" },
+    { id: "ml_oct_06", user_id: "user_001", date: "2023-10-03", merchant: "Grab",           amount: 25,  category: "transport" },
+    { id: "ml_oct_07", user_id: "user_001", date: "2023-10-04", merchant: "Starbucks",      amount: 22,  category: "food" },
+    { id: "ml_oct_08", user_id: "user_001", date: "2023-10-04", merchant: "Grab Food",      amount: 31,  category: "food" },
+    { id: "ml_oct_09", user_id: "user_001", date: "2023-10-05", merchant: "Grab",           amount: 18,  category: "transport" },
+    { id: "ml_oct_10", user_id: "user_001", date: "2023-10-05", merchant: "Watsons",        amount: 88,  category: "beauty" },
+    { id: "ml_oct_11", user_id: "user_001", date: "2023-10-06", merchant: "Grab Food",      amount: 28,  category: "food" },
+    { id: "ml_oct_12", user_id: "user_001", date: "2023-10-07", merchant: "Grab",           amount: 21,  category: "transport" },
+    { id: "ml_oct_13", user_id: "user_001", date: "2023-10-07", merchant: "Starbucks",      amount: 24,  category: "food" },
+    { id: "ml_oct_14", user_id: "user_001", date: "2023-10-08", merchant: "Grab Food",      amount: 36,  category: "food" },
+    { id: "ml_oct_15", user_id: "user_001", date: "2023-10-09", merchant: "Grab",           amount: 24,  category: "transport" },
+    { id: "ml_oct_16", user_id: "user_001", date: "2023-10-09", merchant: "Sephora",        amount: 142, category: "beauty" },
+    { id: "ml_oct_17", user_id: "user_001", date: "2023-10-10", merchant: "Village Grocer", amount: 95,  category: "groceries" },
+    { id: "ml_oct_18", user_id: "user_001", date: "2023-10-10", merchant: "Grab",           amount: 20,  category: "transport" },
+    { id: "ml_oct_19", user_id: "user_001", date: "2023-10-11", merchant: "Starbucks",      amount: 26,  category: "food" },
+    { id: "ml_oct_20", user_id: "user_001", date: "2023-10-11", merchant: "Grab Food",      amount: 30,  category: "food" },
+    { id: "ml_oct_21", user_id: "user_001", date: "2023-10-12", merchant: "Grab",           amount: 22,  category: "transport" },
+    { id: "ml_oct_22", user_id: "user_001", date: "2023-10-13", merchant: "Grab Food",      amount: 33,  category: "food" },
+    { id: "ml_oct_23", user_id: "user_001", date: "2023-10-14", merchant: "Grab",           amount: 18,  category: "transport" },
+    { id: "ml_oct_24", user_id: "user_001", date: "2023-10-14", merchant: "Starbucks",      amount: 22,  category: "food" },
+    { id: "ml_oct_25", user_id: "user_001", date: "2023-10-15", merchant: "Village Grocer", amount: 97,  category: "groceries" },
+    { id: "ml_oct_26", user_id: "user_001", date: "2023-10-16", merchant: "Grab",           amount: 25,  category: "transport" },
+    { id: "ml_oct_27", user_id: "user_001", date: "2023-10-16", merchant: "Grab Food",      amount: 35,  category: "food" },
+    { id: "ml_oct_28", user_id: "user_001", date: "2023-10-17", merchant: "Zalora",         amount: 168, category: "shopping" },
+    { id: "ml_oct_29", user_id: "user_001", date: "2023-10-18", merchant: "Grab",           amount: 19,  category: "transport" },
+    { id: "ml_oct_30", user_id: "user_001", date: "2023-10-18", merchant: "Starbucks",      amount: 24,  category: "food" },
+    { id: "ml_oct_31", user_id: "user_001", date: "2023-10-19", merchant: "Grab Food",      amount: 29,  category: "food" },
+    { id: "ml_oct_32", user_id: "user_001", date: "2023-10-20", merchant: "Grab",           amount: 23,  category: "transport" },
+    { id: "ml_oct_33", user_id: "user_001", date: "2023-10-21", merchant: "Grab Food",      amount: 32,  category: "food" },
+    { id: "ml_oct_34", user_id: "user_001", date: "2023-10-22", merchant: "Grab",           amount: 21,  category: "transport" },
+    { id: "ml_oct_35", user_id: "user_001", date: "2023-10-22", merchant: "Starbucks",      amount: 26,  category: "food" },
+    { id: "ml_oct_36", user_id: "user_001", date: "2023-10-23", merchant: "The Face Shop",  amount: 98,  category: "beauty" },
+    { id: "ml_oct_37", user_id: "user_001", date: "2023-10-24", merchant: "Village Grocer", amount: 88,  category: "groceries" },
+    { id: "ml_oct_38", user_id: "user_001", date: "2023-10-25", merchant: "Grab Food",      amount: 34,  category: "food" },
+    { id: "ml_oct_39", user_id: "user_001", date: "2023-10-25", merchant: "Grab",           amount: 20,  category: "transport" },
+    { id: "ml_oct_40", user_id: "user_001", date: "2023-10-26", merchant: "Starbucks",      amount: 22,  category: "food" },
+    { id: "ml_oct_41", user_id: "user_001", date: "2023-10-27", merchant: "Grab Food",      amount: 30,  category: "food" },
+    { id: "ml_oct_42", user_id: "user_001", date: "2023-10-27", merchant: "Grab",           amount: 18,  category: "transport" },
 
-    // Early January — disciplined, on track
-    { id: "txn_ml_005", user_id: "user_001", date: "2024-01-02", merchant: "Grab Food", amount: 15, category: "food" },
-    { id: "txn_ml_006", user_id: "user_001", date: "2024-01-03", merchant: "Touch n Go", amount: 20, category: "transport" },
-    { id: "txn_ml_007", user_id: "user_001", date: "2024-01-04", merchant: "Aeon", amount: 55, category: "groceries" },
-    { id: "txn_ml_008", user_id: "user_001", date: "2024-01-05", merchant: "Grab Food", amount: 12, category: "food" },
-    { id: "txn_ml_009", user_id: "user_001", date: "2024-01-07", merchant: "KTM Komuter", amount: 8, category: "transport" },
-    { id: "txn_ml_010", user_id: "user_001", date: "2024-01-08", merchant: "Chatime", amount: 9, category: "food" },
-    { id: "txn_ml_011", user_id: "user_001", date: "2024-01-09", merchant: "Grab Food", amount: 18, category: "food" },
-    { id: "txn_ml_012", user_id: "user_001", date: "2024-01-10", merchant: "Watsons", amount: 30, category: "personal" },
+    // NOV 2023
+    { id: "ml_nov_01", user_id: "user_001", date: "2023-11-01", merchant: "Grab",           amount: 20,  category: "transport" },
+    { id: "ml_nov_02", user_id: "user_001", date: "2023-11-01", merchant: "Grab Food",      amount: 36,  category: "food" },
+    { id: "ml_nov_03", user_id: "user_001", date: "2023-11-02", merchant: "Starbucks",      amount: 25,  category: "food" },
+    { id: "ml_nov_04", user_id: "user_001", date: "2023-11-02", merchant: "Grab",           amount: 22,  category: "transport" },
+    { id: "ml_nov_05", user_id: "user_001", date: "2023-11-03", merchant: "Village Grocer", amount: 130, category: "groceries" },
+    { id: "ml_nov_06", user_id: "user_001", date: "2023-11-04", merchant: "Grab Food",      amount: 38,  category: "food" },
+    { id: "ml_nov_07", user_id: "user_001", date: "2023-11-04", merchant: "Grab",           amount: 25,  category: "transport" },
+    { id: "ml_nov_08", user_id: "user_001", date: "2023-11-05", merchant: "Watsons",        amount: 95,  category: "beauty" },
+    { id: "ml_nov_09", user_id: "user_001", date: "2023-11-05", merchant: "Starbucks",      amount: 24,  category: "food" },
+    { id: "ml_nov_10", user_id: "user_001", date: "2023-11-06", merchant: "Grab Food",      amount: 30,  category: "food" },
+    { id: "ml_nov_11", user_id: "user_001", date: "2023-11-07", merchant: "Grab",           amount: 22,  category: "transport" },
+    { id: "ml_nov_12", user_id: "user_001", date: "2023-11-08", merchant: "Shopee",         amount: 189, category: "shopping" },
+    { id: "ml_nov_13", user_id: "user_001", date: "2023-11-08", merchant: "Grab Food",      amount: 32,  category: "food" },
+    { id: "ml_nov_14", user_id: "user_001", date: "2023-11-09", merchant: "Grab",           amount: 24,  category: "transport" },
+    { id: "ml_nov_15", user_id: "user_001", date: "2023-11-09", merchant: "Starbucks",      amount: 26,  category: "food" },
+    { id: "ml_nov_16", user_id: "user_001", date: "2023-11-10", merchant: "Grab Food",      amount: 34,  category: "food" },
+    { id: "ml_nov_17", user_id: "user_001", date: "2023-11-11", merchant: "Grab",           amount: 20,  category: "transport" },
+    { id: "ml_nov_18", user_id: "user_001", date: "2023-11-12", merchant: "Sephora",        amount: 220, category: "beauty" },
+    { id: "ml_nov_19", user_id: "user_001", date: "2023-11-13", merchant: "Village Grocer", amount: 115, category: "groceries" },
+    { id: "ml_nov_20", user_id: "user_001", date: "2023-11-14", merchant: "Grab Food",      amount: 38,  category: "food" },
+    { id: "ml_nov_21", user_id: "user_001", date: "2023-11-14", merchant: "Grab",           amount: 26,  category: "transport" },
+    { id: "ml_nov_22", user_id: "user_001", date: "2023-11-15", merchant: "Starbucks",      amount: 24,  category: "food" },
+    { id: "ml_nov_23", user_id: "user_001", date: "2023-11-16", merchant: "Grab Food",      amount: 36,  category: "food" },
+    { id: "ml_nov_24", user_id: "user_001", date: "2023-11-17", merchant: "Grab",           amount: 22,  category: "transport" },
+    { id: "ml_nov_25", user_id: "user_001", date: "2023-11-18", merchant: "Zalora",         amount: 145, category: "shopping" },
+    { id: "ml_nov_26", user_id: "user_001", date: "2023-11-19", merchant: "Village Grocer", amount: 88,  category: "groceries" },
+    { id: "ml_nov_27", user_id: "user_001", date: "2023-11-20", merchant: "Grab Food",      amount: 40,  category: "food" },
+    { id: "ml_nov_28", user_id: "user_001", date: "2023-11-20", merchant: "Grab",           amount: 24,  category: "transport" },
+    { id: "ml_nov_29", user_id: "user_001", date: "2023-11-21", merchant: "Starbucks",      amount: 26,  category: "food" },
+    { id: "ml_nov_30", user_id: "user_001", date: "2023-11-22", merchant: "Grab Food",      amount: 34,  category: "food" },
+    { id: "ml_nov_31", user_id: "user_001", date: "2023-11-23", merchant: "Grab",           amount: 20,  category: "transport" },
+    { id: "ml_nov_32", user_id: "user_001", date: "2023-11-24", merchant: "The Face Shop",  amount: 110, category: "beauty" },
+    { id: "ml_nov_33", user_id: "user_001", date: "2023-11-25", merchant: "Grab Food",      amount: 32,  category: "food" },
+    { id: "ml_nov_34", user_id: "user_001", date: "2023-11-25", merchant: "Grab",           amount: 18,  category: "transport" },
+    { id: "ml_nov_35", user_id: "user_001", date: "2023-11-26", merchant: "Starbucks",      amount: 24,  category: "food" },
+    { id: "ml_nov_36", user_id: "user_001", date: "2023-11-27", merchant: "Village Grocer", amount: 100, category: "groceries" },
+    { id: "ml_nov_37", user_id: "user_001", date: "2023-11-28", merchant: "Grab Food",      amount: 38,  category: "food" },
+    { id: "ml_nov_38", user_id: "user_001", date: "2023-11-29", merchant: "Grab",           amount: 28,  category: "transport" },
 
-    // Mid January — flash sale slip (this is the problem transaction)
-    { id: "txn_ml_013", user_id: "user_001", date: "2024-01-11", merchant: "Shopee", amount: 132, category: "shopping", note: "flash sale — over budget" },
+    // DEC 2023 - worst month, "I deserve it" year-end energy
+    { id: "ml_dec_01", user_id: "user_001", date: "2023-12-01", merchant: "Grab",           amount: 25,  category: "transport" },
+    { id: "ml_dec_02", user_id: "user_001", date: "2023-12-01", merchant: "Grab Food",      amount: 42,  category: "food" },
+    { id: "ml_dec_03", user_id: "user_001", date: "2023-12-02", merchant: "Starbucks",      amount: 28,  category: "food" },
+    { id: "ml_dec_04", user_id: "user_001", date: "2023-12-03", merchant: "Sephora",        amount: 280, category: "beauty" },
+    { id: "ml_dec_05", user_id: "user_001", date: "2023-12-03", merchant: "Grab",           amount: 28,  category: "transport" },
+    { id: "ml_dec_06", user_id: "user_001", date: "2023-12-04", merchant: "Village Grocer", amount: 155, category: "groceries" },
+    { id: "ml_dec_07", user_id: "user_001", date: "2023-12-05", merchant: "Grab Food",      amount: 45,  category: "food" },
+    { id: "ml_dec_08", user_id: "user_001", date: "2023-12-06", merchant: "Grab",           amount: 30,  category: "transport" },
+    { id: "ml_dec_09", user_id: "user_001", date: "2023-12-06", merchant: "Starbucks",      amount: 28,  category: "food" },
+    { id: "ml_dec_10", user_id: "user_001", date: "2023-12-07", merchant: "Zalora",         amount: 230, category: "shopping" },
+    { id: "ml_dec_11", user_id: "user_001", date: "2023-12-08", merchant: "Grab Food",      amount: 40,  category: "food" },
+    { id: "ml_dec_12", user_id: "user_001", date: "2023-12-09", merchant: "Grab",           amount: 25,  category: "transport" },
+    { id: "ml_dec_13", user_id: "user_001", date: "2023-12-09", merchant: "Starbucks",      amount: 30,  category: "food" },
+    { id: "ml_dec_14", user_id: "user_001", date: "2023-12-10", merchant: "Village Grocer", amount: 145, category: "groceries" },
+    { id: "ml_dec_15", user_id: "user_001", date: "2023-12-11", merchant: "Grab Food",      amount: 48,  category: "food" },
+    { id: "ml_dec_16", user_id: "user_001", date: "2023-12-12", merchant: "Grab",           amount: 30,  category: "transport" },
+    { id: "ml_dec_17", user_id: "user_001", date: "2023-12-13", merchant: "Watsons",        amount: 120, category: "beauty" },
+    { id: "ml_dec_18", user_id: "user_001", date: "2023-12-14", merchant: "Grab Food",      amount: 38,  category: "food" },
+    { id: "ml_dec_19", user_id: "user_001", date: "2023-12-15", merchant: "Grab",           amount: 28,  category: "transport" },
+    { id: "ml_dec_20", user_id: "user_001", date: "2023-12-15", merchant: "Starbucks",      amount: 30,  category: "food" },
+    { id: "ml_dec_21", user_id: "user_001", date: "2023-12-16", merchant: "Pavilion KL",    amount: 310, category: "shopping" },
+    { id: "ml_dec_22", user_id: "user_001", date: "2023-12-17", merchant: "Grab Food",      amount: 50,  category: "food" },
+    { id: "ml_dec_23", user_id: "user_001", date: "2023-12-18", merchant: "Grab",           amount: 32,  category: "transport" },
+    { id: "ml_dec_24", user_id: "user_001", date: "2023-12-19", merchant: "The Face Shop",  amount: 165, category: "beauty" },
+    { id: "ml_dec_25", user_id: "user_001", date: "2023-12-20", merchant: "Village Grocer", amount: 130, category: "groceries" },
+    { id: "ml_dec_26", user_id: "user_001", date: "2023-12-21", merchant: "Grab Food",      amount: 52,  category: "food" },
+    { id: "ml_dec_27", user_id: "user_001", date: "2023-12-22", merchant: "Grab",           amount: 35,  category: "transport" },
+    { id: "ml_dec_28", user_id: "user_001", date: "2023-12-23", merchant: "Starbucks",      amount: 32,  category: "food" },
+    { id: "ml_dec_29", user_id: "user_001", date: "2023-12-24", merchant: "Grab Food",      amount: 55,  category: "food" },
+    { id: "ml_dec_30", user_id: "user_001", date: "2023-12-25", merchant: "Grab",           amount: 38,  category: "transport" },
+    { id: "ml_dec_31", user_id: "user_001", date: "2023-12-26", merchant: "Shopee",         amount: 195, category: "shopping" },
+    { id: "ml_dec_32", user_id: "user_001", date: "2023-12-27", merchant: "Grab Food",      amount: 45,  category: "food" },
+    { id: "ml_dec_33", user_id: "user_001", date: "2023-12-28", merchant: "Grab",           amount: 32,  category: "transport" },
+    { id: "ml_dec_34", user_id: "user_001", date: "2023-12-29", merchant: "Starbucks",      amount: 30,  category: "food" },
 
-    // Mid-late January — back to discipline after the slip
-    { id: "txn_ml_014", user_id: "user_001", date: "2024-01-12", merchant: "Grab Food", amount: 14, category: "food" },
-    { id: "txn_ml_015", user_id: "user_001", date: "2024-01-13", merchant: "Watsons", amount: 45, category: "personal" },
-    { id: "txn_ml_016", user_id: "user_001", date: "2024-01-14", merchant: "Grab Food", amount: 18, category: "food" },
-    { id: "txn_ml_017", user_id: "user_001", date: "2024-01-15", merchant: "Touch n Go", amount: 15, category: "transport" },
-    { id: "txn_ml_018", user_id: "user_001", date: "2024-01-16", merchant: "Aeon", amount: 48, category: "groceries" },
-    { id: "txn_ml_019", user_id: "user_001", date: "2024-01-18", merchant: "Grab Food", amount: 11, category: "food" },
-    { id: "txn_ml_020", user_id: "user_001", date: "2024-01-20", merchant: "Chatime", amount: 8, category: "food" },
-    { id: "txn_ml_021", user_id: "user_001", date: "2024-01-22", merchant: "KTM Komuter", amount: 10, category: "transport" },
-    { id: "txn_ml_022", user_id: "user_001", date: "2024-01-24", merchant: "Grab Food", amount: 16, category: "food" },
+    // JAN 2024 - same habits, no change
+    { id: "ml_jan_01", user_id: "user_001", date: "2024-01-01", merchant: "Grab",           amount: 22,  category: "transport" },
+    { id: "ml_jan_02", user_id: "user_001", date: "2024-01-01", merchant: "Starbucks",      amount: 26,  category: "food" },
+    { id: "ml_jan_03", user_id: "user_001", date: "2024-01-02", merchant: "Grab Food",      amount: 34,  category: "food" },
+    { id: "ml_jan_04", user_id: "user_001", date: "2024-01-03", merchant: "Grab",           amount: 20,  category: "transport" },
+    { id: "ml_jan_05", user_id: "user_001", date: "2024-01-04", merchant: "Village Grocer", amount: 125, category: "groceries" },
+    { id: "ml_jan_06", user_id: "user_001", date: "2024-01-05", merchant: "Grab Food",      amount: 38,  category: "food" },
+    { id: "ml_jan_07", user_id: "user_001", date: "2024-01-05", merchant: "Grab",           amount: 22,  category: "transport" },
+    { id: "ml_jan_08", user_id: "user_001", date: "2024-01-06", merchant: "Starbucks",      amount: 24,  category: "food" },
+    { id: "ml_jan_09", user_id: "user_001", date: "2024-01-07", merchant: "Grab Food",      amount: 32,  category: "food" },
+    { id: "ml_jan_10", user_id: "user_001", date: "2024-01-08", merchant: "Grab",           amount: 20,  category: "transport" },
+    { id: "ml_jan_11", user_id: "user_001", date: "2024-01-08", merchant: "Watsons",        amount: 98,  category: "beauty" },
+    { id: "ml_jan_12", user_id: "user_001", date: "2024-01-09", merchant: "Grab Food",      amount: 36,  category: "food" },
+    { id: "ml_jan_13", user_id: "user_001", date: "2024-01-10", merchant: "Grab",           amount: 24,  category: "transport" },
+    { id: "ml_jan_14", user_id: "user_001", date: "2024-01-10", merchant: "Starbucks",      amount: 26,  category: "food" },
+    { id: "ml_jan_15", user_id: "user_001", date: "2024-01-11", merchant: "Shopee",         amount: 132, category: "shopping" },
+    { id: "ml_jan_16", user_id: "user_001", date: "2024-01-12", merchant: "Grab Food",      amount: 30,  category: "food" },
+    { id: "ml_jan_17", user_id: "user_001", date: "2024-01-13", merchant: "Grab",           amount: 18,  category: "transport" },
+    { id: "ml_jan_18", user_id: "user_001", date: "2024-01-13", merchant: "Starbucks",      amount: 24,  category: "food" },
+    { id: "ml_jan_19", user_id: "user_001", date: "2024-01-14", merchant: "Grab Food",      amount: 35,  category: "food" },
+    { id: "ml_jan_20", user_id: "user_001", date: "2024-01-15", merchant: "Grab",           amount: 20,  category: "transport" },
+    { id: "ml_jan_21", user_id: "user_001", date: "2024-01-16", merchant: "Village Grocer", amount: 110, category: "groceries" },
+    { id: "ml_jan_22", user_id: "user_001", date: "2024-01-17", merchant: "Grab Food",      amount: 32,  category: "food" },
+    { id: "ml_jan_23", user_id: "user_001", date: "2024-01-18", merchant: "Grab",           amount: 22,  category: "transport" },
+    { id: "ml_jan_24", user_id: "user_001", date: "2024-01-20", merchant: "Starbucks",      amount: 25,  category: "food" },
+    { id: "ml_jan_25", user_id: "user_001", date: "2024-01-22", merchant: "Grab Food",      amount: 34,  category: "food" },
+    { id: "ml_jan_26", user_id: "user_001", date: "2024-01-24", merchant: "Grab",           amount: 22,  category: "transport" },
 
-    // ─────────────────────────────────────────────
-    // JASON (user_002)
-    // Pattern: Payday (25th) triggers instant lifestyle flex.
-    // Weekend dining always spikes. Europe savings barely touched.
-    // Denial cycle: spends big, convinces himself he'll "cut back next month."
-    // ─────────────────────────────────────────────
+    // ─── JASON (user_002) ──────────────────────────────────────────────────────
+    // Denial cycle. Payday = immediate flex. Weekends cost 3x weekdays.
+    // Dec = worst (year-end YOLO). Jan marginal pullback but still catastrophically over.
+    // Europe savings: frozen at 5%.
 
-    // Last month payday window (Dec 25–31) — immediate flex
-    { id: "txn_j_001", user_id: "user_002", date: "2024-12-25", merchant: "Isetan KLCC", amount: 420, category: "shopping", note: "payday flex" },
-    { id: "txn_j_002", user_id: "user_002", date: "2024-12-26", merchant: "Nobu KL", amount: 350, category: "dining", note: "payday celebration dinner" },
-    { id: "txn_j_003", user_id: "user_002", date: "2024-12-27", merchant: "Grab", amount: 35, category: "transport" },
-    { id: "txn_j_004", user_id: "user_002", date: "2024-12-28", merchant: "Zouk KL", amount: 180, category: "entertainment", note: "weekend night out" },
-    { id: "txn_j_005", user_id: "user_002", date: "2024-12-29", merchant: "Pavilion", amount: 310, category: "shopping" },
-    { id: "txn_j_006", user_id: "user_002", date: "2024-12-31", merchant: "New Year Eve dinner", amount: 290, category: "dining" },
+    // OCT 2023
+    { id: "j_oct_01", user_id: "user_002", date: "2023-10-01", merchant: "Grab Food",       amount: 44,  category: "dining" },
+    { id: "j_oct_02", user_id: "user_002", date: "2023-10-02", merchant: "Starbucks",       amount: 28,  category: "dining" },
+    { id: "j_oct_03", user_id: "user_002", date: "2023-10-03", merchant: "Grab",            amount: 38,  category: "transport" },
+    { id: "j_oct_04", user_id: "user_002", date: "2023-10-04", merchant: "Grab Food",       amount: 48,  category: "dining" },
+    { id: "j_oct_05", user_id: "user_002", date: "2023-10-05", merchant: "Marini's on 57",  amount: 210, category: "entertainment" },
+    { id: "j_oct_06", user_id: "user_002", date: "2023-10-06", merchant: "Nobu KL",         amount: 290, category: "dining" },
+    { id: "j_oct_07", user_id: "user_002", date: "2023-10-07", merchant: "Pavilion KL",     amount: 340, category: "shopping" },
+    { id: "j_oct_08", user_id: "user_002", date: "2023-10-08", merchant: "Grab Food",       amount: 42,  category: "dining" },
+    { id: "j_oct_09", user_id: "user_002", date: "2023-10-09", merchant: "Grab",            amount: 35,  category: "transport" },
+    { id: "j_oct_10", user_id: "user_002", date: "2023-10-10", merchant: "Starbucks",       amount: 26,  category: "dining" },
+    { id: "j_oct_11", user_id: "user_002", date: "2023-10-11", merchant: "Grab Food",       amount: 50,  category: "dining" },
+    { id: "j_oct_12", user_id: "user_002", date: "2023-10-12", merchant: "SkyBar KL",       amount: 175, category: "entertainment" },
+    { id: "j_oct_13", user_id: "user_002", date: "2023-10-13", merchant: "KLCC",            amount: 280, category: "shopping" },
+    { id: "j_oct_14", user_id: "user_002", date: "2023-10-14", merchant: "Jiro KL",         amount: 195, category: "dining" },
+    { id: "j_oct_15", user_id: "user_002", date: "2023-10-15", merchant: "Grab Food",       amount: 38,  category: "dining" },
+    { id: "j_oct_16", user_id: "user_002", date: "2023-10-16", merchant: "Grab",            amount: 32,  category: "transport" },
+    { id: "j_oct_17", user_id: "user_002", date: "2023-10-17", merchant: "Grab Food",       amount: 45,  category: "dining" },
+    { id: "j_oct_18", user_id: "user_002", date: "2023-10-18", merchant: "Grab Food",       amount: 40,  category: "dining" },
+    { id: "j_oct_19", user_id: "user_002", date: "2023-10-19", merchant: "Zouk KL",         amount: 160, category: "entertainment" },
+    { id: "j_oct_20", user_id: "user_002", date: "2023-10-20", merchant: "Isetan KLCC",     amount: 390, category: "shopping" },
+    { id: "j_oct_21", user_id: "user_002", date: "2023-10-21", merchant: "Naughty Nuri's",  amount: 95,  category: "dining" },
+    { id: "j_oct_22", user_id: "user_002", date: "2023-10-22", merchant: "Grab Food",       amount: 44,  category: "dining" },
+    { id: "j_oct_23", user_id: "user_002", date: "2023-10-23", merchant: "Grab",            amount: 30,  category: "transport" },
+    { id: "j_oct_24", user_id: "user_002", date: "2023-10-24", merchant: "Grab Food",       amount: 36,  category: "dining" },
+    { id: "j_oct_25", user_id: "user_002", date: "2023-10-25", merchant: "Nobu KL",         amount: 310, category: "dining" },
+    { id: "j_oct_26", user_id: "user_002", date: "2023-10-26", merchant: "Marini's on 57",  amount: 230, category: "entertainment" },
+    { id: "j_oct_27", user_id: "user_002", date: "2023-10-27", merchant: "Pavilion KL",     amount: 310, category: "shopping" },
+    { id: "j_oct_28", user_id: "user_002", date: "2023-10-28", merchant: "Grab Food",       amount: 42,  category: "dining" },
 
-    // Early January — slight slowdown but still over
-    { id: "txn_j_007", user_id: "user_002", date: "2024-01-02", merchant: "Grab Food", amount: 45, category: "dining" },
-    { id: "txn_j_008", user_id: "user_002", date: "2024-01-03", merchant: "Starbucks", amount: 28, category: "dining" },
-    { id: "txn_j_009", user_id: "user_002", date: "2024-01-04", merchant: "Grab", amount: 42, category: "transport" },
-    { id: "txn_j_010", user_id: "user_002", date: "2024-01-05", merchant: "Naughty Nuri's", amount: 95, category: "dining", note: "weekend" },
-    { id: "txn_j_011", user_id: "user_002", date: "2024-01-06", merchant: "Marini's on 57", amount: 185, category: "entertainment", note: "weekend" },
+    // NOV 2023
+    { id: "j_nov_01", user_id: "user_002", date: "2023-11-01", merchant: "Grab Food",       amount: 48,  category: "dining" },
+    { id: "j_nov_02", user_id: "user_002", date: "2023-11-02", merchant: "Grab",            amount: 40,  category: "transport" },
+    { id: "j_nov_03", user_id: "user_002", date: "2023-11-03", merchant: "Nobu KL",         amount: 320, category: "dining" },
+    { id: "j_nov_04", user_id: "user_002", date: "2023-11-04", merchant: "Pavilion KL",     amount: 350, category: "shopping" },
+    { id: "j_nov_05", user_id: "user_002", date: "2023-11-05", merchant: "SkyBar KL",       amount: 190, category: "entertainment" },
+    { id: "j_nov_06", user_id: "user_002", date: "2023-11-06", merchant: "Grab Food",       amount: 42,  category: "dining" },
+    { id: "j_nov_07", user_id: "user_002", date: "2023-11-07", merchant: "Starbucks",       amount: 28,  category: "dining" },
+    { id: "j_nov_08", user_id: "user_002", date: "2023-11-08", merchant: "Grab",            amount: 38,  category: "transport" },
+    { id: "j_nov_09", user_id: "user_002", date: "2023-11-09", merchant: "Jiro KL",         amount: 220, category: "dining" },
+    { id: "j_nov_10", user_id: "user_002", date: "2023-11-10", merchant: "Isetan KLCC",     amount: 420, category: "shopping" },
+    { id: "j_nov_11", user_id: "user_002", date: "2023-11-11", merchant: "Grab Food",       amount: 50,  category: "dining" },
+    { id: "j_nov_12", user_id: "user_002", date: "2023-11-12", merchant: "Zouk KL",         amount: 200, category: "entertainment" },
+    { id: "j_nov_13", user_id: "user_002", date: "2023-11-13", merchant: "Grab Food",       amount: 40,  category: "dining" },
+    { id: "j_nov_14", user_id: "user_002", date: "2023-11-14", merchant: "Grab",            amount: 42,  category: "transport" },
+    { id: "j_nov_15", user_id: "user_002", date: "2023-11-15", merchant: "Grab Food",       amount: 38,  category: "dining" },
+    { id: "j_nov_16", user_id: "user_002", date: "2023-11-16", merchant: "Nobu KL",         amount: 360, category: "dining" },
+    { id: "j_nov_17", user_id: "user_002", date: "2023-11-17", merchant: "Grab Food",       amount: 44,  category: "dining" },
+    { id: "j_nov_18", user_id: "user_002", date: "2023-11-18", merchant: "Grab",            amount: 36,  category: "transport" },
+    { id: "j_nov_19", user_id: "user_002", date: "2023-11-19", merchant: "Pavilion KL",     amount: 290, category: "shopping" },
+    { id: "j_nov_20", user_id: "user_002", date: "2023-11-20", merchant: "Grab Food",       amount: 55,  category: "dining" },
+    { id: "j_nov_21", user_id: "user_002", date: "2023-11-21", merchant: "Grab",            amount: 35,  category: "transport" },
+    { id: "j_nov_22", user_id: "user_002", date: "2023-11-22", merchant: "Marini's on 57",  amount: 215, category: "entertainment" },
+    { id: "j_nov_23", user_id: "user_002", date: "2023-11-23", merchant: "Naughty Nuri's",  amount: 110, category: "dining" },
+    { id: "j_nov_24", user_id: "user_002", date: "2023-11-24", merchant: "Grab Food",       amount: 42,  category: "dining" },
+    { id: "j_nov_25", user_id: "user_002", date: "2023-11-25", merchant: "SkyBar KL",       amount: 185, category: "entertainment" },
+    { id: "j_nov_26", user_id: "user_002", date: "2023-11-26", merchant: "Grab Food",       amount: 48,  category: "dining" },
+    { id: "j_nov_27", user_id: "user_002", date: "2023-11-27", merchant: "Grab",            amount: 38,  category: "transport" },
+    { id: "j_nov_28", user_id: "user_002", date: "2023-11-28", merchant: "Grab Food",       amount: 40,  category: "dining" },
 
-    // Mid January — the denial phase ("I'll save next month")
-    { id: "txn_j_012", user_id: "user_002", date: "2024-01-08", merchant: "Grab Food", amount: 38, category: "dining" },
-    { id: "txn_j_013", user_id: "user_002", date: "2024-01-09", merchant: "Starbucks", amount: 22, category: "dining" },
-    { id: "txn_j_014", user_id: "user_002", date: "2024-01-10", merchant: "Grab", amount: 30, category: "transport" },
-    { id: "txn_j_015", user_id: "user_002", date: "2024-01-11", merchant: "Pavilion", amount: 260, category: "shopping" },
-    { id: "txn_j_016", user_id: "user_002", date: "2024-01-12", merchant: "Jiro KL", amount: 220, category: "dining", note: "weekend flex" },
-    { id: "txn_j_017", user_id: "user_002", date: "2024-01-13", merchant: "SkyBar", amount: 160, category: "entertainment", note: "weekend" },
-    { id: "txn_j_018", user_id: "user_002", date: "2024-01-14", merchant: "Grab Food", amount: 35, category: "dining" },
-    { id: "txn_j_019", user_id: "user_002", date: "2024-01-15", merchant: "Nobu KL", amount: 380, category: "dining", note: "latest big spend" },
+    // DEC 2023 - worst month: year-end YOLO
+    { id: "j_dec_01", user_id: "user_002", date: "2023-12-01", merchant: "Grab Food",       amount: 55,  category: "dining" },
+    { id: "j_dec_02", user_id: "user_002", date: "2023-12-02", merchant: "Grab",            amount: 45,  category: "transport" },
+    { id: "j_dec_03", user_id: "user_002", date: "2023-12-03", merchant: "Nobu KL",         amount: 420, category: "dining" },
+    { id: "j_dec_04", user_id: "user_002", date: "2023-12-04", merchant: "Isetan KLCC",     amount: 580, category: "shopping" },
+    { id: "j_dec_05", user_id: "user_002", date: "2023-12-05", merchant: "Grab Food",       amount: 58,  category: "dining" },
+    { id: "j_dec_06", user_id: "user_002", date: "2023-12-06", merchant: "Grab",            amount: 44,  category: "transport" },
+    { id: "j_dec_07", user_id: "user_002", date: "2023-12-07", merchant: "Zouk KL",         amount: 240, category: "entertainment" },
+    { id: "j_dec_08", user_id: "user_002", date: "2023-12-08", merchant: "Pavilion KL",     amount: 490, category: "shopping" },
+    { id: "j_dec_09", user_id: "user_002", date: "2023-12-09", merchant: "Jiro KL",         amount: 350, category: "dining" },
+    { id: "j_dec_10", user_id: "user_002", date: "2023-12-10", merchant: "Marini's on 57",  amount: 280, category: "entertainment" },
+    { id: "j_dec_11", user_id: "user_002", date: "2023-12-11", merchant: "Grab Food",       amount: 52,  category: "dining" },
+    { id: "j_dec_12", user_id: "user_002", date: "2023-12-12", merchant: "Grab",            amount: 48,  category: "transport" },
+    { id: "j_dec_13", user_id: "user_002", date: "2023-12-13", merchant: "Grab Food",       amount: 60,  category: "dining" },
+    { id: "j_dec_14", user_id: "user_002", date: "2023-12-14", merchant: "SkyBar KL",       amount: 260, category: "entertainment" },
+    { id: "j_dec_15", user_id: "user_002", date: "2023-12-15", merchant: "Nobu KL",         amount: 390, category: "dining" },
+    { id: "j_dec_16", user_id: "user_002", date: "2023-12-16", merchant: "Isetan KLCC",     amount: 520, category: "shopping" },
+    { id: "j_dec_17", user_id: "user_002", date: "2023-12-17", merchant: "Grab Food",       amount: 58,  category: "dining" },
+    { id: "j_dec_18", user_id: "user_002", date: "2023-12-18", merchant: "Grab",            amount: 50,  category: "transport" },
+    { id: "j_dec_19", user_id: "user_002", date: "2023-12-19", merchant: "Marini's on 57",  amount: 310, category: "entertainment" },
+    { id: "j_dec_20", user_id: "user_002", date: "2023-12-20", merchant: "Grab Food",       amount: 65,  category: "dining" },
+    { id: "j_dec_21", user_id: "user_002", date: "2023-12-21", merchant: "Nobu KL",         amount: 450, category: "dining" },
+    { id: "j_dec_22", user_id: "user_002", date: "2023-12-22", merchant: "Pavilion KL",     amount: 600, category: "shopping" },
+    { id: "j_dec_23", user_id: "user_002", date: "2023-12-24", merchant: "Christmas Eve dinner", amount: 480, category: "dining" },
+    { id: "j_dec_24", user_id: "user_002", date: "2023-12-26", merchant: "Grab",            amount: 50,  category: "transport" },
+    { id: "j_dec_25", user_id: "user_002", date: "2023-12-28", merchant: "Zouk KL NYE",     amount: 350, category: "entertainment" },
+    { id: "j_dec_26", user_id: "user_002", date: "2023-12-31", merchant: "NYE dinner",      amount: 490, category: "dining" },
 
-    // ─────────────────────────────────────────────
-    // HAKIM (user_003)
-    // Pattern: Month started with a "good month" feeling → tool splurge.
-    // Mid-month reality check as income uncertainty sets in.
-    // Subscriptions eat budget quietly. Coworking bill due in 2 days.
-    // ─────────────────────────────────────────────
+    // JAN 2024 - slight pullback, still nowhere near control
+    { id: "j_jan_01", user_id: "user_002", date: "2024-01-02", merchant: "Grab Food",       amount: 45,  category: "dining" },
+    { id: "j_jan_02", user_id: "user_002", date: "2024-01-03", merchant: "Starbucks",       amount: 28,  category: "dining" },
+    { id: "j_jan_03", user_id: "user_002", date: "2024-01-04", merchant: "Grab",            amount: 42,  category: "transport" },
+    { id: "j_jan_04", user_id: "user_002", date: "2024-01-05", merchant: "Naughty Nuri's",  amount: 95,  category: "dining" },
+    { id: "j_jan_05", user_id: "user_002", date: "2024-01-06", merchant: "Marini's on 57",  amount: 185, category: "entertainment" },
+    { id: "j_jan_06", user_id: "user_002", date: "2024-01-07", merchant: "Grab Food",       amount: 38,  category: "dining" },
+    { id: "j_jan_07", user_id: "user_002", date: "2024-01-08", merchant: "Starbucks",       amount: 22,  category: "dining" },
+    { id: "j_jan_08", user_id: "user_002", date: "2024-01-09", merchant: "Grab",            amount: 30,  category: "transport" },
+    { id: "j_jan_09", user_id: "user_002", date: "2024-01-10", merchant: "Grab Food",       amount: 42,  category: "dining" },
+    { id: "j_jan_10", user_id: "user_002", date: "2024-01-11", merchant: "Pavilion KL",     amount: 260, category: "shopping" },
+    { id: "j_jan_11", user_id: "user_002", date: "2024-01-12", merchant: "Jiro KL",         amount: 220, category: "dining" },
+    { id: "j_jan_12", user_id: "user_002", date: "2024-01-13", merchant: "SkyBar KL",       amount: 160, category: "entertainment" },
+    { id: "j_jan_13", user_id: "user_002", date: "2024-01-14", merchant: "Grab Food",       amount: 35,  category: "dining" },
+    { id: "j_jan_14", user_id: "user_002", date: "2024-01-15", merchant: "Nobu KL",         amount: 380, category: "dining" },
 
-    // Early January — "good month" invincibility mode
-    { id: "txn_h_001", user_id: "user_003", date: "2024-01-01", merchant: "Shopee", amount: 55, category: "work_tools", note: "mouse pad and cable" },
-    { id: "txn_h_002", user_id: "user_003", date: "2024-01-02", merchant: "Canva Pro", amount: 55, category: "subscriptions" },
-    { id: "txn_h_003", user_id: "user_003", date: "2024-01-03", merchant: "Grab Food", amount: 18, category: "food" },
-    { id: "txn_h_004", user_id: "user_003", date: "2024-01-04", merchant: "Figma", amount: 75, category: "subscriptions" },
-    { id: "txn_h_005", user_id: "user_003", date: "2024-01-05", merchant: "Mamak", amount: 9, category: "food" },
-    { id: "txn_h_006", user_id: "user_003", date: "2024-01-06", merchant: "Logitech", amount: 340, category: "work_tools", note: "keyboard — big splurge" },
-    { id: "txn_h_007", user_id: "user_003", date: "2024-01-07", merchant: "Grab Food", amount: 15, category: "food" },
-    { id: "txn_h_008", user_id: "user_003", date: "2024-01-08", merchant: "Udemy", amount: 89, category: "work_tools", note: "course — convinced himself it's investment" },
-    { id: "txn_h_009", user_id: "user_003", date: "2024-01-09", merchant: "Mamak", amount: 8, category: "food" },
+    // ─── HAKIM (user_003) ──────────────────────────────────────────────────────
+    // IMPROVEMENT ARC: Oct/Nov flush -> tool splurge. Dec income crashed -> forced frugality.
+    // Jan recovering but slipping (Logitech keyboard = old habit showing).
 
-    // Mid January — reality creeping in, spending slows
-    { id: "txn_h_010", user_id: "user_003", date: "2024-01-10", merchant: "Adobe", amount: 52, category: "subscriptions" },
-    { id: "txn_h_011", user_id: "user_003", date: "2024-01-11", merchant: "Grab Food", amount: 12, category: "food" },
-    { id: "txn_h_012", user_id: "user_003", date: "2024-01-12", merchant: "Mamak", amount: 7, category: "food" },
-    { id: "txn_h_013", user_id: "user_003", date: "2024-01-13", merchant: "Touch n Go", amount: 15, category: "transport" },
-    { id: "txn_h_014", user_id: "user_003", date: "2024-01-14", merchant: "Grab Food", amount: 14, category: "food" },
+    // OCT 2023 - income RM 3,800, invincibility mode
+    { id: "h_oct_01", user_id: "user_003", date: "2023-10-01", merchant: "Shopee",          amount: 180, category: "work_tools" },
+    { id: "h_oct_02", user_id: "user_003", date: "2023-10-02", merchant: "Canva Pro",       amount: 55,  category: "subscriptions" },
+    { id: "h_oct_03", user_id: "user_003", date: "2023-10-02", merchant: "Grab Food",       amount: 22,  category: "food" },
+    { id: "h_oct_04", user_id: "user_003", date: "2023-10-03", merchant: "Coursera",        amount: 160, category: "work_tools" },
+    { id: "h_oct_05", user_id: "user_003", date: "2023-10-04", merchant: "Mamak",           amount: 10,  category: "food" },
+    { id: "h_oct_06", user_id: "user_003", date: "2023-10-05", merchant: "Adobe",           amount: 52,  category: "subscriptions" },
+    { id: "h_oct_07", user_id: "user_003", date: "2023-10-06", merchant: "Grab Food",       amount: 18,  category: "food" },
+    { id: "h_oct_08", user_id: "user_003", date: "2023-10-07", merchant: "Shopee",          amount: 280, category: "work_tools" },
+    { id: "h_oct_09", user_id: "user_003", date: "2023-10-08", merchant: "Mamak",           amount: 9,   category: "food" },
+    { id: "h_oct_10", user_id: "user_003", date: "2023-10-09", merchant: "Figma",           amount: 75,  category: "subscriptions" },
+    { id: "h_oct_11", user_id: "user_003", date: "2023-10-10", merchant: "Grab Food",       amount: 20,  category: "food" },
+    { id: "h_oct_12", user_id: "user_003", date: "2023-10-11", merchant: "Udemy",           amount: 120, category: "work_tools" },
+    { id: "h_oct_13", user_id: "user_003", date: "2023-10-12", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "h_oct_14", user_id: "user_003", date: "2023-10-13", merchant: "Shopee",          amount: 95,  category: "work_tools" },
+    { id: "h_oct_15", user_id: "user_003", date: "2023-10-14", merchant: "Grab Food",       amount: 16,  category: "food" },
+    { id: "h_oct_16", user_id: "user_003", date: "2023-10-15", merchant: "Grab",            amount: 25,  category: "transport" },
+    { id: "h_oct_17", user_id: "user_003", date: "2023-10-16", merchant: "Mamak",           amount: 9,   category: "food" },
+    { id: "h_oct_18", user_id: "user_003", date: "2023-10-18", merchant: "Skillshare",      amount: 85,  category: "work_tools" },
+    { id: "h_oct_19", user_id: "user_003", date: "2023-10-19", merchant: "Grab Food",       amount: 18,  category: "food" },
+    { id: "h_oct_20", user_id: "user_003", date: "2023-10-20", merchant: "Adobe",           amount: 52,  category: "subscriptions" },
+    { id: "h_oct_21", user_id: "user_003", date: "2023-10-22", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "h_oct_22", user_id: "user_003", date: "2023-10-24", merchant: "Shopee",          amount: 140, category: "work_tools" },
+    { id: "h_oct_23", user_id: "user_003", date: "2023-10-26", merchant: "Grab Food",       amount: 15,  category: "food" },
+    { id: "h_oct_24", user_id: "user_003", date: "2023-10-28", merchant: "Grab",            amount: 22,  category: "transport" },
+    { id: "h_oct_25", user_id: "user_003", date: "2023-10-30", merchant: "Mamak",           amount: 8,   category: "food" },
 
-    // Late January — frugal mode, anxious, coworking bill looming
-    { id: "txn_h_015", user_id: "user_003", date: "2024-01-15", merchant: "Mamak", amount: 8, category: "food" },
-    { id: "txn_h_016", user_id: "user_003", date: "2024-01-16", merchant: "KTM Komuter", amount: 6, category: "transport" },
+    // NOV 2023 - income RM 3,100, still spending freely
+    { id: "h_nov_01", user_id: "user_003", date: "2023-11-01", merchant: "Canva Pro",       amount: 55,  category: "subscriptions" },
+    { id: "h_nov_02", user_id: "user_003", date: "2023-11-01", merchant: "Grab Food",       amount: 20,  category: "food" },
+    { id: "h_nov_03", user_id: "user_003", date: "2023-11-02", merchant: "Shopee",          amount: 220, category: "work_tools" },
+    { id: "h_nov_04", user_id: "user_003", date: "2023-11-03", merchant: "Mamak",           amount: 9,   category: "food" },
+    { id: "h_nov_05", user_id: "user_003", date: "2023-11-04", merchant: "Figma",           amount: 75,  category: "subscriptions" },
+    { id: "h_nov_06", user_id: "user_003", date: "2023-11-05", merchant: "Grab Food",       amount: 18,  category: "food" },
+    { id: "h_nov_07", user_id: "user_003", date: "2023-11-06", merchant: "Udemy",           amount: 89,  category: "work_tools" },
+    { id: "h_nov_08", user_id: "user_003", date: "2023-11-07", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "h_nov_09", user_id: "user_003", date: "2023-11-08", merchant: "Adobe",           amount: 52,  category: "subscriptions" },
+    { id: "h_nov_10", user_id: "user_003", date: "2023-11-09", merchant: "Grab Food",       amount: 22,  category: "food" },
+    { id: "h_nov_11", user_id: "user_003", date: "2023-11-10", merchant: "Logitech",        amount: 155, category: "work_tools" },
+    { id: "h_nov_12", user_id: "user_003", date: "2023-11-11", merchant: "Grab",            amount: 20,  category: "transport" },
+    { id: "h_nov_13", user_id: "user_003", date: "2023-11-12", merchant: "Mamak",           amount: 9,   category: "food" },
+    { id: "h_nov_14", user_id: "user_003", date: "2023-11-14", merchant: "Grab Food",       amount: 17,  category: "food" },
+    { id: "h_nov_15", user_id: "user_003", date: "2023-11-15", merchant: "Coursera",        amount: 130, category: "work_tools" },
+    { id: "h_nov_16", user_id: "user_003", date: "2023-11-16", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "h_nov_17", user_id: "user_003", date: "2023-11-18", merchant: "Grab Food",       amount: 16,  category: "food" },
+    { id: "h_nov_18", user_id: "user_003", date: "2023-11-20", merchant: "Shopee",          amount: 175, category: "work_tools" },
+    { id: "h_nov_19", user_id: "user_003", date: "2023-11-22", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "h_nov_20", user_id: "user_003", date: "2023-11-24", merchant: "Adobe",           amount: 52,  category: "subscriptions" },
+    { id: "h_nov_21", user_id: "user_003", date: "2023-11-26", merchant: "Grab Food",       amount: 15,  category: "food" },
+    { id: "h_nov_22", user_id: "user_003", date: "2023-11-28", merchant: "Shopee",          amount: 98,  category: "work_tools" },
+    { id: "h_nov_23", user_id: "user_003", date: "2023-11-29", merchant: "Mamak",           amount: 8,   category: "food" },
 
-    // Last month comparison — December was a slow month (shows the spiral pattern)
-    { id: "txn_h_dec_001", user_id: "user_003", date: "2023-12-05", merchant: "Shopee", amount: 220, category: "work_tools", note: "December splurge too" },
-    { id: "txn_h_dec_002", user_id: "user_003", date: "2023-12-08", merchant: "Coursera", amount: 120, category: "work_tools" },
-    { id: "txn_h_dec_003", user_id: "user_003", date: "2023-12-10", merchant: "Adobe", amount: 52, category: "subscriptions" },
-    { id: "txn_h_dec_004", user_id: "user_003", date: "2023-12-12", merchant: "Grab Food", amount: 10, category: "food" },
-    { id: "txn_h_dec_005", user_id: "user_003", date: "2023-12-15", merchant: "Mamak", amount: 7, category: "food" },
-    { id: "txn_h_dec_006", user_id: "user_003", date: "2023-12-18", merchant: "Mamak", amount: 6, category: "food" },
-    { id: "txn_h_dec_007", user_id: "user_003", date: "2023-12-22", merchant: "Grab Food", amount: 9, category: "food" },
+    // DEC 2023 - income RM 1,100. FORCED FRUGALITY. IMPROVEMENT.
+    // Zero tool purchases. KTM instead of Grab. Mamak only.
+    { id: "h_dec_01", user_id: "user_003", date: "2023-12-01", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "h_dec_02", user_id: "user_003", date: "2023-12-02", merchant: "Canva Pro",       amount: 55,  category: "subscriptions" },
+    { id: "h_dec_03", user_id: "user_003", date: "2023-12-03", merchant: "Grab Food",       amount: 12,  category: "food" },
+    { id: "h_dec_04", user_id: "user_003", date: "2023-12-04", merchant: "KTM Komuter",     amount: 8,   category: "transport" },
+    { id: "h_dec_05", user_id: "user_003", date: "2023-12-05", merchant: "Mamak",           amount: 7,   category: "food" },
+    { id: "h_dec_06", user_id: "user_003", date: "2023-12-06", merchant: "Adobe",           amount: 52,  category: "subscriptions" },
+    { id: "h_dec_07", user_id: "user_003", date: "2023-12-07", merchant: "Mamak",           amount: 7,   category: "food" },
+    { id: "h_dec_08", user_id: "user_003", date: "2023-12-08", merchant: "Grab Food",       amount: 11,  category: "food" },
+    { id: "h_dec_09", user_id: "user_003", date: "2023-12-09", merchant: "KTM Komuter",     amount: 6,   category: "transport" },
+    { id: "h_dec_10", user_id: "user_003", date: "2023-12-10", merchant: "Mamak",           amount: 7,   category: "food" },
+    { id: "h_dec_11", user_id: "user_003", date: "2023-12-12", merchant: "Mamak",           amount: 7,   category: "food" },
+    { id: "h_dec_12", user_id: "user_003", date: "2023-12-13", merchant: "Grab Food",       amount: 10,  category: "food" },
+    { id: "h_dec_13", user_id: "user_003", date: "2023-12-14", merchant: "KTM Komuter",     amount: 8,   category: "transport" },
+    { id: "h_dec_14", user_id: "user_003", date: "2023-12-15", merchant: "Mamak",           amount: 7,   category: "food" },
+    { id: "h_dec_15", user_id: "user_003", date: "2023-12-17", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "h_dec_16", user_id: "user_003", date: "2023-12-18", merchant: "Grab Food",       amount: 11,  category: "food" },
+    { id: "h_dec_17", user_id: "user_003", date: "2023-12-19", merchant: "KTM Komuter",     amount: 6,   category: "transport" },
+    { id: "h_dec_18", user_id: "user_003", date: "2023-12-20", merchant: "Mamak",           amount: 7,   category: "food" },
+    { id: "h_dec_19", user_id: "user_003", date: "2023-12-22", merchant: "Mamak",           amount: 7,   category: "food" },
+    { id: "h_dec_20", user_id: "user_003", date: "2023-12-24", merchant: "Grab Food",       amount: 12,  category: "food" },
+    { id: "h_dec_21", user_id: "user_003", date: "2023-12-26", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "h_dec_22", user_id: "user_003", date: "2023-12-28", merchant: "KTM Komuter",     amount: 8,   category: "transport" },
+    { id: "h_dec_23", user_id: "user_003", date: "2023-12-30", merchant: "Mamak",           amount: 7,   category: "food" },
 
-    // ─────────────────────────────────────────────
-    // SHOKO (user_004)
-    // Pattern: Payday (1st) → immediate hobby splurge within first week.
-    // Food spending drops sharply after hobbies eat the budget.
-    // By mid-month she's surviving on RM 6–8 mamak meals only.
-    // ─────────────────────────────────────────────
+    // JAN 2024 - income RM 2,200, holding Dec mostly but one tool slip
+    { id: "h_jan_01", user_id: "user_003", date: "2024-01-01", merchant: "Canva Pro",       amount: 55,  category: "subscriptions" },
+    { id: "h_jan_02", user_id: "user_003", date: "2024-01-02", merchant: "Grab Food",       amount: 14,  category: "food" },
+    { id: "h_jan_03", user_id: "user_003", date: "2024-01-03", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "h_jan_04", user_id: "user_003", date: "2024-01-04", merchant: "Figma",           amount: 75,  category: "subscriptions" },
+    { id: "h_jan_05", user_id: "user_003", date: "2024-01-05", merchant: "Mamak",           amount: 9,   category: "food" },
+    { id: "h_jan_06", user_id: "user_003", date: "2024-01-06", merchant: "Logitech",        amount: 340, category: "work_tools" },
+    { id: "h_jan_07", user_id: "user_003", date: "2024-01-07", merchant: "Grab Food",       amount: 13,  category: "food" },
+    { id: "h_jan_08", user_id: "user_003", date: "2024-01-08", merchant: "Udemy",           amount: 89,  category: "work_tools" },
+    { id: "h_jan_09", user_id: "user_003", date: "2024-01-09", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "h_jan_10", user_id: "user_003", date: "2024-01-10", merchant: "Adobe",           amount: 52,  category: "subscriptions" },
+    { id: "h_jan_11", user_id: "user_003", date: "2024-01-11", merchant: "Grab Food",       amount: 12,  category: "food" },
+    { id: "h_jan_12", user_id: "user_003", date: "2024-01-12", merchant: "Mamak",           amount: 7,   category: "food" },
+    { id: "h_jan_13", user_id: "user_003", date: "2024-01-13", merchant: "KTM Komuter",     amount: 8,   category: "transport" },
+    { id: "h_jan_14", user_id: "user_003", date: "2024-01-14", merchant: "Grab Food",       amount: 12,  category: "food" },
+    { id: "h_jan_15", user_id: "user_003", date: "2024-01-15", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "h_jan_16", user_id: "user_003", date: "2024-01-16", merchant: "KTM Komuter",     amount: 6,   category: "transport" },
 
-    // Payday day 1 — immediate hobby spending
-    { id: "txn_s_001", user_id: "user_004", date: "2024-01-01", merchant: "Kinokuniya", amount: 89, category: "hobbies", note: "payday, first spend" },
-    { id: "txn_s_002", user_id: "user_004", date: "2024-01-01", merchant: "Grab Food", amount: 18, category: "food", note: "only decent meal of month" },
+    // ─── SHOKO (user_004) ──────────────────────────────────────────────────────
+    // IMPROVEMENT ARC:
+    //   Oct = worst. Food RM ~75. Hobby RM ~430. Deep meal-skipping.
+    //   Nov = awareness. Food up to RM ~145. Hobby RM ~310.
+    //   Dec = BEST. Self-imposed hobby cap RM 160. Food RM ~220. She CAN do it.
+    //   Jan = full regression. Payday -> hobby binge -> broke by day 15.
 
-    // Days 2–5 — hobby binge, food still okay
-    { id: "txn_s_003", user_id: "user_004", date: "2024-01-02", merchant: "Anime Store", amount: 64, category: "hobbies" },
-    { id: "txn_s_004", user_id: "user_004", date: "2024-01-02", merchant: "Mamak", amount: 8, category: "food" },
-    { id: "txn_s_005", user_id: "user_004", date: "2024-01-03", merchant: "Rapidbus", amount: 5, category: "transport" },
-    { id: "txn_s_006", user_id: "user_004", date: "2024-01-04", merchant: "Art Friend", amount: 145, category: "hobbies" },
-    { id: "txn_s_007", user_id: "user_004", date: "2024-01-04", merchant: "7-Eleven", amount: 6, category: "food", note: "food getting cheaper" },
-    { id: "txn_s_008", user_id: "user_004", date: "2024-01-05", merchant: "7-Eleven", amount: 20, category: "food" },
+    // OCT 2023 - worst month
+    { id: "s_oct_01", user_id: "user_004", date: "2023-10-01", merchant: "Kinokuniya",      amount: 95,  category: "hobbies" },
+    { id: "s_oct_02", user_id: "user_004", date: "2023-10-01", merchant: "Grab Food",       amount: 20,  category: "food" },
+    { id: "s_oct_03", user_id: "user_004", date: "2023-10-02", merchant: "Anime Store",     amount: 78,  category: "hobbies" },
+    { id: "s_oct_04", user_id: "user_004", date: "2023-10-03", merchant: "Mamak",           amount: 6,   category: "food" },
+    { id: "s_oct_05", user_id: "user_004", date: "2023-10-04", merchant: "Art Friend",      amount: 132, category: "hobbies" },
+    { id: "s_oct_06", user_id: "user_004", date: "2023-10-05", merchant: "7-Eleven",        amount: 5,   category: "food" },
+    { id: "s_oct_07", user_id: "user_004", date: "2023-10-06", merchant: "Rapidbus",        amount: 5,   category: "transport" },
+    { id: "s_oct_08", user_id: "user_004", date: "2023-10-07", merchant: "Mamak",           amount: 6,   category: "food" },
+    { id: "s_oct_09", user_id: "user_004", date: "2023-10-08", merchant: "Kinokuniya",      amount: 65,  category: "hobbies" },
+    { id: "s_oct_10", user_id: "user_004", date: "2023-10-10", merchant: "7-Eleven",        amount: 5,   category: "food" },
+    { id: "s_oct_11", user_id: "user_004", date: "2023-10-11", merchant: "Mamak",           amount: 6,   category: "food" },
+    { id: "s_oct_12", user_id: "user_004", date: "2023-10-12", merchant: "Anime Store",     amount: 55,  category: "hobbies" },
+    { id: "s_oct_13", user_id: "user_004", date: "2023-10-14", merchant: "7-Eleven",        amount: 5,   category: "food" },
+    { id: "s_oct_14", user_id: "user_004", date: "2023-10-15", merchant: "Rapidbus",        amount: 5,   category: "transport" },
+    { id: "s_oct_15", user_id: "user_004", date: "2023-10-16", merchant: "Mamak",           amount: 6,   category: "food" },
+    { id: "s_oct_16", user_id: "user_004", date: "2023-10-18", merchant: "7-Eleven",        amount: 5,   category: "food" },
+    { id: "s_oct_17", user_id: "user_004", date: "2023-10-20", merchant: "Mamak",           amount: 6,   category: "food" },
+    { id: "s_oct_18", user_id: "user_004", date: "2023-10-21", merchant: "Art Friend",      amount: 65,  category: "hobbies" },
+    { id: "s_oct_19", user_id: "user_004", date: "2023-10-23", merchant: "7-Eleven",        amount: 5,   category: "food" },
+    { id: "s_oct_20", user_id: "user_004", date: "2023-10-25", merchant: "Mamak",           amount: 6,   category: "food" },
+    { id: "s_oct_21", user_id: "user_004", date: "2023-10-27", merchant: "7-Eleven",        amount: 5,   category: "food" },
+    { id: "s_oct_22", user_id: "user_004", date: "2023-10-29", merchant: "Mamak",           amount: 6,   category: "food" },
 
-    // Days 9–13 — hobby budget blown, food drops to danger zone
-    { id: "txn_s_009", user_id: "user_004", date: "2024-01-09", merchant: "Rapidbus", amount: 5, category: "transport" },
-    { id: "txn_s_010", user_id: "user_004", date: "2024-01-11", merchant: "Mamak", amount: 6, category: "food", note: "skipping meals" },
-    { id: "txn_s_011", user_id: "user_004", date: "2024-01-13", merchant: "Art Friend", amount: 145, category: "hobbies" },
-    { id: "txn_s_012", user_id: "user_004", date: "2024-01-13", merchant: "Mamak", amount: 6, category: "food" },
+    // NOV 2023 - slight awareness, food improves
+    { id: "s_nov_01", user_id: "user_004", date: "2023-11-01", merchant: "Kinokuniya",      amount: 85,  category: "hobbies" },
+    { id: "s_nov_02", user_id: "user_004", date: "2023-11-01", merchant: "Grab Food",       amount: 22,  category: "food" },
+    { id: "s_nov_03", user_id: "user_004", date: "2023-11-02", merchant: "Mamak",           amount: 9,   category: "food" },
+    { id: "s_nov_04", user_id: "user_004", date: "2023-11-03", merchant: "Art Friend",      amount: 98,  category: "hobbies" },
+    { id: "s_nov_05", user_id: "user_004", date: "2023-11-04", merchant: "Mamak",           amount: 9,   category: "food" },
+    { id: "s_nov_06", user_id: "user_004", date: "2023-11-05", merchant: "Rapidbus",        amount: 5,   category: "transport" },
+    { id: "s_nov_07", user_id: "user_004", date: "2023-11-06", merchant: "7-Eleven",        amount: 8,   category: "food" },
+    { id: "s_nov_08", user_id: "user_004", date: "2023-11-07", merchant: "Anime Store",     amount: 55,  category: "hobbies" },
+    { id: "s_nov_09", user_id: "user_004", date: "2023-11-08", merchant: "Mamak",           amount: 9,   category: "food" },
+    { id: "s_nov_10", user_id: "user_004", date: "2023-11-09", merchant: "Grab Food",       amount: 18,  category: "food" },
+    { id: "s_nov_11", user_id: "user_004", date: "2023-11-10", merchant: "Mamak",           amount: 9,   category: "food" },
+    { id: "s_nov_12", user_id: "user_004", date: "2023-11-11", merchant: "Kinokuniya",      amount: 70,  category: "hobbies" },
+    { id: "s_nov_13", user_id: "user_004", date: "2023-11-12", merchant: "Mamak",           amount: 9,   category: "food" },
+    { id: "s_nov_14", user_id: "user_004", date: "2023-11-13", merchant: "Grab Food",       amount: 18,  category: "food" },
+    { id: "s_nov_15", user_id: "user_004", date: "2023-11-15", merchant: "Mamak",           amount: 9,   category: "food" },
+    { id: "s_nov_16", user_id: "user_004", date: "2023-11-16", merchant: "Rapidbus",        amount: 5,   category: "transport" },
+    { id: "s_nov_17", user_id: "user_004", date: "2023-11-17", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "s_nov_18", user_id: "user_004", date: "2023-11-18", merchant: "Anime Store",     amount: 55,  category: "hobbies" },
+    { id: "s_nov_19", user_id: "user_004", date: "2023-11-20", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "s_nov_20", user_id: "user_004", date: "2023-11-22", merchant: "7-Eleven",        amount: 7,   category: "food" },
+    { id: "s_nov_21", user_id: "user_004", date: "2023-11-24", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "s_nov_22", user_id: "user_004", date: "2023-11-25", merchant: "Kinokuniya",      amount: 45,  category: "hobbies" },
+    { id: "s_nov_23", user_id: "user_004", date: "2023-11-26", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "s_nov_24", user_id: "user_004", date: "2023-11-27", merchant: "7-Eleven",        amount: 7,   category: "food" },
+    { id: "s_nov_25", user_id: "user_004", date: "2023-11-29", merchant: "Mamak",           amount: 8,   category: "food" },
 
-    // Days 14–15 — nearly broke, still eyeing manga
-    { id: "txn_s_013", user_id: "user_004", date: "2024-01-15", merchant: "Kinokuniya", amount: 189, category: "hobbies", note: "latest big spend, almost broke now" },
+    // DEC 2023 - BEST MONTH. Self-imposed hobby cap. Proof she can do it.
+    { id: "s_dec_01", user_id: "user_004", date: "2023-12-01", merchant: "Kinokuniya",      amount: 60,  category: "hobbies" },
+    { id: "s_dec_02", user_id: "user_004", date: "2023-12-01", merchant: "Grab Food",       amount: 25,  category: "food" },
+    { id: "s_dec_03", user_id: "user_004", date: "2023-12-02", merchant: "Mamak",           amount: 10,  category: "food" },
+    { id: "s_dec_04", user_id: "user_004", date: "2023-12-03", merchant: "Rapidbus",        amount: 5,   category: "transport" },
+    { id: "s_dec_05", user_id: "user_004", date: "2023-12-04", merchant: "Grab Food",       amount: 22,  category: "food" },
+    { id: "s_dec_06", user_id: "user_004", date: "2023-12-05", merchant: "Mamak",           amount: 10,  category: "food" },
+    { id: "s_dec_07", user_id: "user_004", date: "2023-12-06", merchant: "Grab Food",       amount: 22,  category: "food" },
+    { id: "s_dec_08", user_id: "user_004", date: "2023-12-07", merchant: "Mamak",           amount: 10,  category: "food" },
+    { id: "s_dec_09", user_id: "user_004", date: "2023-12-08", merchant: "Art Friend",      amount: 55,  category: "hobbies" },
+    { id: "s_dec_10", user_id: "user_004", date: "2023-12-09", merchant: "Mamak",           amount: 10,  category: "food" },
+    { id: "s_dec_11", user_id: "user_004", date: "2023-12-10", merchant: "Grab Food",       amount: 20,  category: "food" },
+    { id: "s_dec_12", user_id: "user_004", date: "2023-12-11", merchant: "Mamak",           amount: 10,  category: "food" },
+    { id: "s_dec_13", user_id: "user_004", date: "2023-12-13", merchant: "7-Eleven",        amount: 8,   category: "food" },
+    { id: "s_dec_14", user_id: "user_004", date: "2023-12-14", merchant: "Mamak",           amount: 10,  category: "food" },
+    { id: "s_dec_15", user_id: "user_004", date: "2023-12-15", merchant: "Rapidbus",        amount: 5,   category: "transport" },
+    { id: "s_dec_16", user_id: "user_004", date: "2023-12-16", merchant: "Grab Food",       amount: 22,  category: "food" },
+    { id: "s_dec_17", user_id: "user_004", date: "2023-12-18", merchant: "Mamak",           amount: 10,  category: "food" },
+    { id: "s_dec_18", user_id: "user_004", date: "2023-12-20", merchant: "Grab Food",       amount: 22,  category: "food" },
+    { id: "s_dec_19", user_id: "user_004", date: "2023-12-21", merchant: "Mamak",           amount: 10,  category: "food" },
+    { id: "s_dec_20", user_id: "user_004", date: "2023-12-22", merchant: "Kinokuniya",      amount: 45,  category: "hobbies" },
+    { id: "s_dec_21", user_id: "user_004", date: "2023-12-23", merchant: "Grab Food",       amount: 24,  category: "food" },
+    { id: "s_dec_22", user_id: "user_004", date: "2023-12-24", merchant: "Mamak",           amount: 10,  category: "food" },
+    { id: "s_dec_23", user_id: "user_004", date: "2023-12-26", merchant: "7-Eleven",        amount: 8,   category: "food" },
+    { id: "s_dec_24", user_id: "user_004", date: "2023-12-27", merchant: "Mamak",           amount: 10,  category: "food" },
+    { id: "s_dec_25", user_id: "user_004", date: "2023-12-29", merchant: "7-Eleven",        amount: 7,   category: "food" },
 
-    // Last month (December) — same exact pattern, proves it's recurring
-    { id: "txn_s_dec_001", user_id: "user_004", date: "2023-12-01", merchant: "Kinokuniya", amount: 95, category: "hobbies", note: "december payday spend" },
-    { id: "txn_s_dec_002", user_id: "user_004", date: "2023-12-01", merchant: "Grab Food", amount: 20, category: "food" },
-    { id: "txn_s_dec_003", user_id: "user_004", date: "2023-12-03", merchant: "Anime Store", amount: 78, category: "hobbies" },
-    { id: "txn_s_dec_004", user_id: "user_004", date: "2023-12-04", merchant: "Mamak", amount: 8, category: "food" },
-    { id: "txn_s_dec_005", user_id: "user_004", date: "2023-12-06", merchant: "Art Friend", amount: 120, category: "hobbies" },
-    { id: "txn_s_dec_006", user_id: "user_004", date: "2023-12-10", merchant: "Mamak", amount: 6, category: "food", note: "food dropping" },
-    { id: "txn_s_dec_007", user_id: "user_004", date: "2023-12-14", merchant: "Mamak", amount: 6, category: "food" },
-    { id: "txn_s_dec_008", user_id: "user_004", date: "2023-12-18", merchant: "7-Eleven", amount: 5, category: "food", note: "surviving on convenience store food" },
-    { id: "txn_s_dec_009", user_id: "user_004", date: "2023-12-22", merchant: "Mamak", amount: 6, category: "food" }
+    // JAN 2024 - full regression, Dec forgotten
+    { id: "s_jan_01", user_id: "user_004", date: "2024-01-01", merchant: "Kinokuniya",      amount: 89,  category: "hobbies" },
+    { id: "s_jan_02", user_id: "user_004", date: "2024-01-01", merchant: "Grab Food",       amount: 18,  category: "food" },
+    { id: "s_jan_03", user_id: "user_004", date: "2024-01-02", merchant: "Anime Store",     amount: 64,  category: "hobbies" },
+    { id: "s_jan_04", user_id: "user_004", date: "2024-01-02", merchant: "Mamak",           amount: 8,   category: "food" },
+    { id: "s_jan_05", user_id: "user_004", date: "2024-01-03", merchant: "Rapidbus",        amount: 5,   category: "transport" },
+    { id: "s_jan_06", user_id: "user_004", date: "2024-01-04", merchant: "Art Friend",      amount: 145, category: "hobbies" },
+    { id: "s_jan_07", user_id: "user_004", date: "2024-01-04", merchant: "7-Eleven",        amount: 6,   category: "food" },
+    { id: "s_jan_08", user_id: "user_004", date: "2024-01-05", merchant: "7-Eleven",        amount: 8,   category: "food" },
+    { id: "s_jan_09", user_id: "user_004", date: "2024-01-07", merchant: "Mamak",           amount: 6,   category: "food" },
+    { id: "s_jan_10", user_id: "user_004", date: "2024-01-09", merchant: "Rapidbus",        amount: 5,   category: "transport" },
+    { id: "s_jan_11", user_id: "user_004", date: "2024-01-11", merchant: "Mamak",           amount: 6,   category: "food" },
+    { id: "s_jan_12", user_id: "user_004", date: "2024-01-13", merchant: "Art Friend",      amount: 145, category: "hobbies" },
+    { id: "s_jan_13", user_id: "user_004", date: "2024-01-13", merchant: "Mamak",           amount: 6,   category: "food" },
+    { id: "s_jan_14", user_id: "user_004", date: "2024-01-15", merchant: "Kinokuniya",      amount: 189, category: "hobbies" }
   ],
 
   bills: [
-    // Mei Ling
-    { id: "bill_001", user_id: "user_001", name: "Room rental", amount: 300, due_date: "2024-02-01", recurring: true },
-
-    // Jason
-    { id: "bill_002", user_id: "user_002", name: "Studio rental", amount: 700, due_date: "2024-02-01", recurring: true },
-    { id: "bill_003", user_id: "user_002", name: "Credit card", amount: 500, due_date: "2024-01-25", recurring: true },
-    { id: "bill_004", user_id: "user_002", name: "Car loan", amount: 650, due_date: "2024-01-28", recurring: true },
-
-    // Hakim
-    { id: "bill_005", user_id: "user_003", name: "Room rental", amount: 300, due_date: "2024-02-01", recurring: true },
+    { id: "bill_001", user_id: "user_001", name: "Room rental",         amount: 300, due_date: "2024-02-01", recurring: true },
+    { id: "bill_002", user_id: "user_002", name: "Studio rental",       amount: 700, due_date: "2024-02-01", recurring: true },
+    { id: "bill_003", user_id: "user_002", name: "Credit card",         amount: 500, due_date: "2024-01-25", recurring: true },
+    { id: "bill_004", user_id: "user_002", name: "Car loan",            amount: 650, due_date: "2024-01-28", recurring: true },
+    { id: "bill_005", user_id: "user_003", name: "Room rental",         amount: 300, due_date: "2024-02-01", recurring: true },
     { id: "bill_006", user_id: "user_003", name: "Coworking workspace", amount: 200, due_date: "2024-01-17", recurring: true },
-
-    // Shoko
-    { id: "bill_007", user_id: "user_004", name: "University dorm", amount: 400, due_date: "2024-02-01", recurring: true },
-    { id: "bill_008", user_id: "user_004", name: "Rapidbus pass", amount: 30, due_date: "2024-02-01", recurring: true }
+    { id: "bill_007", user_id: "user_004", name: "University dorm",     amount: 400, due_date: "2024-02-01", recurring: true },
+    { id: "bill_008", user_id: "user_004", name: "Rapidbus pass",       amount: 30,  due_date: "2024-02-01", recurring: true }
   ],
 
   budgets: [
-    // Mei Ling
-    { user_id: "user_001", category: "food", limit: 300 },
-    { user_id: "user_001", category: "shopping", limit: 100 },
-    { user_id: "user_001", category: "transport", limit: 100 },
+    { user_id: "user_001", category: "transport",   limit: 100 },
+    { user_id: "user_001", category: "food",        limit: 350 },
+    { user_id: "user_001", category: "groceries",   limit: 200 },
+    { user_id: "user_001", category: "beauty",      limit: 80  },
+    { user_id: "user_001", category: "shopping",    limit: 100 },
 
-    // Jason
-    { user_id: "user_002", category: "dining", limit: 200 },
-    { user_id: "user_002", category: "shopping", limit: 200 },
+    { user_id: "user_002", category: "dining",        limit: 200 },
+    { user_id: "user_002", category: "shopping",      limit: 200 },
     { user_id: "user_002", category: "entertainment", limit: 150 },
 
-    // Hakim
-    { user_id: "user_003", category: "work_tools", limit: 100 },
+    { user_id: "user_003", category: "work_tools",    limit: 100 },
     { user_id: "user_003", category: "subscriptions", limit: 100 },
-    { user_id: "user_003", category: "food", limit: 250 },
+    { user_id: "user_003", category: "food",          limit: 250 },
 
-    // Shoko
-    { user_id: "user_004", category: "hobbies", limit: 80 },
-    { user_id: "user_004", category: "food", limit: 400 },
-    { user_id: "user_004", category: "transport", limit: 50 }
+    { user_id: "user_004", category: "hobbies",    limit: 80  },
+    { user_id: "user_004", category: "food",       limit: 400 },
+    { user_id: "user_004", category: "transport",  limit: 50  }
   ],
 
   malls: [
@@ -416,19 +613,20 @@ if (!db.data) {
   await db.write();
 } else {
   let dirty = false;
-  if (!db.data.users || db.data.users.length === 0) {
-    db.data.users = defaultData.users;
+
+  if (!db.data.malls || db.data.malls.length === 0) {
+    db.data.malls = defaultData.malls;
+    dirty = true;
+  }
+  if (!db.data.income || db.data.income.length === 0) {
+    db.data.income = defaultData.income;
     dirty = true;
   }
   if (!db.data.budgets || db.data.budgets.length === 0) {
     db.data.budgets = defaultData.budgets;
     dirty = true;
   }
-  if (!db.data.malls || db.data.malls.length === 0) {
-    db.data.malls = defaultData.malls;
-    dirty = true;
-  }
-  // Ensure accounts have id and safe_to_spend
+
   db.data.accounts = db.data.accounts.map((acc) => {
     const seed = defaultData.accounts.find(a => a.user_id === acc.user_id);
     if (!acc.id || acc.safe_to_spend === undefined) {
@@ -437,7 +635,7 @@ if (!db.data) {
     }
     return acc;
   });
-  // Ensure users have home/live location fields
+
   const locationDefaults = {
     user_001: { home_lat: 3.0838, home_lng: 101.7471 },
     user_002: { home_lat: 3.1729, home_lng: 101.6481 },
@@ -452,6 +650,7 @@ if (!db.data) {
     }
     return u;
   });
+
   if (dirty) await db.write();
 }
 

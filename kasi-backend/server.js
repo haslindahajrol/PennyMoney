@@ -156,6 +156,25 @@ app.get("/sync/:userId", async (req, res) => {
   }
 });
 
+// ── GET /transactions/:userId ─────────────────────────────────────────────────
+// Returns all transactions for a user, sorted oldest-first for AI analysis
+app.get('/transactions/:userId', (req, res) => {
+  const { userId } = req.params;
+  const txns = db.data.transactions
+    .filter(t => t.user_id === userId)
+    .sort((a, b) => a.date.localeCompare(b.date));
+  res.json(txns);
+});
+
+// ── GET /income/:userId ───────────────────────────────────────────────────────
+app.get('/income/:userId', (req, res) => {
+  const { userId } = req.params;
+  const income = (db.data.income || [])
+    .filter(i => i.user_id === userId)
+    .sort((a, b) => a.date.localeCompare(b.date));
+  res.json(income);
+});
+
 app.listen(PORT, () => {
   console.log(`Kasi backend running on http://localhost:${PORT}`);
 });

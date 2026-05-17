@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import {
   Home,
   Wallet,
@@ -105,47 +105,6 @@ type Bill = { id: string; user_id: string; name: string; amount: number; due_dat
 type Transaction = { id: string; user_id: string; date: string; merchant: string; amount: number; category: string; type: "credit" | "debit" };
 
 
-const MOCK_AI_RESPONSES: Record<string, Record<string, string>> = {
-  user_001: {
-    default:
-      "Hey Mei Ling! Your tracking is on point as always. You have RM 210 safe to spend this week. That Mydin Grocery purchase was RM 156.80 — stay mindful of shopping limits!",
-    save: "Great question! Your savings are at RM 1,100. I recommend setting aside at least 20% of your income — that's RM 500/month. Try automating transfers right after payday.",
-    budget:
-      "Your shopping budget is RM 100/month but you've spent RM 132 already. Consider using cash envelopes for discretionary spending — it helps you stay within limits.",
-    invest:
-      "You have great investments! Tabung Haji (+4.2%), ASB (+5.8%), ASM (+3.1%), and KWSP (+6.1%) are all performing well. Keep your voluntary contributions consistent.",
-    expense:
-      "Looking at your recent expenses: Mydin Grocery RM 156.80, Petronas Fuel RM 120, and Grab Food RM 32.50. Food and transport are your main categories right now.",
-  },
-  user_002: {
-    default:
-      "Jason. Real talk. Your dining budget is blown — 90% over at RM 380 vs RM 200 limit. Every RM 100 you spend on restaurants is RM 100 NOT in savings.",
-    save: "Your savings rate is critically low. At your income of RM 6,000, you should be saving at least RM 1,200/month. Cut dining and shopping first.",
-    budget:
-      "Two budget violations: Dining RM 380 (limit RM 200) and Shopping RM 260 (limit RM 200). That's RM 240 overspent. Time to course-correct.",
-    invest: "Start investing before spending on lifestyle. Even RM 300/month in ASB compounds significantly over time.",
-    expense: "High lifestyle expenses this month. Consider meal prepping to cut dining costs by at least 50%.",
-  },
-  user_003: {
-    default:
-      "Hey Hakim. Balance is RM 980 and your work tools spending is 329% over budget. As a freelancer, every ringgit counts — was that purchase revenue-generating?",
-    save: "With variable income, aim to save 30% during good months to buffer slow periods. Your 3-month emergency fund goal is critical.",
-    budget:
-      "Work tools at RM 429 vs RM 100 budget is concerning. Only invest in tools that directly increase your earning capacity.",
-    invest: "ASB is great for irregular income — you can contribute any amount anytime. Start with whatever you can.",
-    expense:
-      "Track which tools generate ROI. If a RM 429 purchase helps you earn RM 2,000 more, it's justified. Otherwise, hold off.",
-  },
-  user_004: {
-    default:
-      "Shoko, hobbies at 398% over budget and balance is only RM 312. Please make sure you're eating properly. Your finances need attention.",
-    save: "I know hobbies bring joy, but with RM 1,300 income, try the 50/30/20 rule: RM 650 needs, RM 390 wants (including hobbies), RM 260 savings.",
-    budget: "RM 398 on hobbies vs RM 80 budget is RM 318 over. Let's find a sustainable way to enjoy hobbies without financial stress.",
-    invest: "Even RM 50/month in ASB builds a habit. Small consistent amounts add up over time.",
-    expense: "Please include proper meals in your budget. Food is non-negotiable — aim for at least RM 200/month for meals.",
-  },
-};
-
 // ─── Helpers ───────────────────────────────────────────────────────────────
 
 function fmt(amount: number) {
@@ -235,17 +194,15 @@ function BottomNav({ active, onChange }: { active: Tab; onChange: (t: Tab) => vo
 // ─── Login Screen ──────────────────────────────────────────────────────────
 
 function LoginScreen({ onSelect }: { onSelect: (user: (typeof TEST_USERS)[0]) => void }) {
-  const [selected, setSelected] = useState<string | null>(null);
-
   return (
-    <div className="flex flex-col min-h-full bg-[#F7F9EE]">
+    <div className="flex flex-col flex-1 bg-[#F7F9EE]">
       {/* Header */}
       <div className="bg-gradient-to-b from-[#7AAD47] to-[#5D8733] rounded-b-3xl px-6 pt-14 pb-10 flex flex-col items-center">
         <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mb-4">
           <Wallet size={28} className="text-white" />
         </div>
         <h1 className="text-white text-2xl font-bold">Penny</h1>
-        <p className="text-white/80 text-sm mt-1">Select a test account to continue</p>
+        <p className="text-white/80 text-sm mt-1">Tap an account to get started</p>
       </div>
 
       <div className="flex-1 px-4 pt-6 pb-4 overflow-y-auto">
@@ -254,12 +211,8 @@ function LoginScreen({ onSelect }: { onSelect: (user: (typeof TEST_USERS)[0]) =>
           {TEST_USERS.map((user) => (
             <button
               key={user.id}
-              onClick={() => setSelected(user.id)}
-              className={`w-full text-left p-4 rounded-2xl border transition-all ${
-                selected === user.id
-                  ? "border-[#5D8733] bg-[#5D8733]/10"
-                  : "border-[#C8E0A8] bg-white hover:border-[#9DC870]"
-              }`}
+              onClick={() => onSelect(user)}
+              className="w-full text-left p-4 rounded-2xl border border-[#C8E0A8] bg-white hover:border-[#5D8733] hover:bg-[#5D8733]/5 active:scale-[0.98] transition-all"
             >
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full bg-[#EEF3E3] flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -268,11 +221,14 @@ function LoginScreen({ onSelect }: { onSelect: (user: (typeof TEST_USERS)[0]) =>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <span className="text-[#1B2A16] font-semibold">{user.name}</span>
-                    {user.status === "warning" ? (
-                      <TrendingUp size={16} className="text-[#5D8733]" />
-                    ) : (
-                      <AlertTriangle size={16} className="text-red-400" />
-                    )}
+                    <div className="flex items-center gap-1.5">
+                      {user.status === "warning" ? (
+                        <TrendingUp size={14} className="text-[#5D8733]" />
+                      ) : (
+                        <AlertTriangle size={14} className="text-red-400" />
+                      )}
+                      <ChevronRight size={14} className="text-[#9DAD8F]" />
+                    </div>
                   </div>
                   <p className="text-[#748A68] text-xs mt-0.5">{user.role}</p>
                   <p className="text-[#748A68] text-xs mt-0.5 truncate">{user.budgetAlert}</p>
@@ -280,26 +236,6 @@ function LoginScreen({ onSelect }: { onSelect: (user: (typeof TEST_USERS)[0]) =>
               </div>
             </button>
           ))}
-        </div>
-
-        <div className="mt-6 space-y-3">
-          <button
-            onClick={() => {
-              const user = TEST_USERS.find((u) => u.id === selected);
-              if (user) onSelect(user);
-            }}
-            disabled={!selected}
-            className={`w-full py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 transition-all ${
-              selected
-                ? "bg-[#5D8733] text-white hover:bg-[#4A6F28]"
-                : "bg-[#E5EDD8] text-[#9DAD8F] cursor-not-allowed"
-            }`}
-          >
-            Continue as Selected User <ChevronRight size={16} />
-          </button>
-          <button className="w-full py-4 rounded-2xl font-semibold bg-white text-[#1B2A16] border border-[#C8E0A8] hover:bg-[#EEF3E3] transition-colors">
-            Create New Account
-          </button>
         </div>
       </div>
     </div>
@@ -659,36 +595,54 @@ function WalletScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
 // ─── Chat Screen ───────────────────────────────────────────────────────────
 
 type Message = { role: "user" | "ai"; text: string };
+type HistoryMsg = { role: "user" | "assistant"; content: string };
 
 const QUICK_PROMPTS = [
-  { label: "How can I save more?", icon: <TrendingUp size={12} /> },
-  { label: "Help me budget", icon: <CreditCard size={12} /> },
-  { label: "Investment tips", icon: <PiggyBank size={12} /> },
-  { label: "Reduce expenses", icon: <Target size={12} /> },
+  { label: "How am I doing this month?", icon: <TrendingUp size={12} /> },
+  { label: "How long can I stretch?", icon: <Clock size={12} /> },
+  { label: "Where am I overspending?", icon: <Target size={12} /> },
+  { label: "Help me cut expenses", icon: <CreditCard size={12} /> },
 ];
 
 function ChatScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [history, setHistory] = useState<HistoryMsg[]>([]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
-  const userResponses = MOCK_AI_RESPONSES[user.id];
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isLoading]);
 
-  function getResponse(text: string) {
-    const t = text.toLowerCase();
-    if (t.includes("save") || t.includes("saving")) return userResponses.save;
-    if (t.includes("budget")) return userResponses.budget;
-    if (t.includes("invest")) return userResponses.invest;
-    if (t.includes("expense") || t.includes("spend")) return userResponses.expense;
-    return userResponses.default;
-  }
-
-  function send(text: string) {
-    if (!text.trim()) return;
-    setMessages((prev) => [...prev, { role: "user", text }]);
+  async function send(text: string) {
+    if (!text.trim() || isLoading) return;
     setInput("");
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { role: "ai", text: getResponse(text) }]);
-    }, 600);
+    setError(null);
+    setMessages((prev) => [...prev, { role: "user", text }]);
+    setIsLoading(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id, message: text, history }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Something went wrong.");
+      } else {
+        setMessages((prev) => [...prev, { role: "ai", text: data.reply }]);
+        setHistory(data.history);
+      }
+    } catch {
+      setError("Can't reach the server. Make sure the backend is running.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -701,32 +655,36 @@ function ChatScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
         <div>
           <p className="text-[#1B2A16] font-semibold">Penny</p>
           <p className="text-[#5D8733] text-xs flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#5D8733] inline-block" /> Online
+            <span className="w-1.5 h-1.5 rounded-full bg-[#5D8733] inline-block" />
+            {isLoading ? "Thinking..." : "Online"}
           </p>
         </div>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        {/* Greeting */}
         <div className="flex gap-3">
           <div className="w-8 h-8 rounded-full bg-[#EEF3E3] border border-[#C8E0A8] flex items-center justify-center flex-shrink-0">
-            <span className="text-[#5D8733] text-xs font-bold">AI</span>
+            <span className="text-[#5D8733] text-xs font-bold">P</span>
           </div>
-          <div className="bg-white border border-[#C8E0A8] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[75%]">
+          <div className="bg-white border border-[#C8E0A8] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[78%]">
             <p className="text-[#1B2A16] text-sm">
-              Hi {user.name}! I&apos;m your AI financial advisor. How can I help you today?
+              Hey {user.name}! 👋 I know your spending inside out — ask me anything about your money.
             </p>
           </div>
         </div>
+
+        {/* Conversation */}
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
             {msg.role === "ai" && (
               <div className="w-8 h-8 rounded-full bg-[#EEF3E3] border border-[#C8E0A8] flex items-center justify-center flex-shrink-0">
-                <span className="text-[#5D8733] text-xs font-bold">AI</span>
+                <span className="text-[#5D8733] text-xs font-bold">P</span>
               </div>
             )}
             <div
-              className={`rounded-2xl px-4 py-3 max-w-[75%] text-sm ${
+              className={`rounded-2xl px-4 py-3 max-w-[78%] text-sm whitespace-pre-wrap ${
                 msg.role === "user"
                   ? "bg-[#5D8733] text-white rounded-tr-sm"
                   : "bg-white border border-[#C8E0A8] text-[#1B2A16] rounded-tl-sm"
@@ -736,16 +694,47 @@ function ChatScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
             </div>
           </div>
         ))}
+
+        {/* Typing indicator */}
+        {isLoading && (
+          <div className="flex gap-3">
+            <div className="w-8 h-8 rounded-full bg-[#EEF3E3] border border-[#C8E0A8] flex items-center justify-center flex-shrink-0">
+              <span className="text-[#5D8733] text-xs font-bold">P</span>
+            </div>
+            <div className="bg-white border border-[#C8E0A8] rounded-2xl rounded-tl-sm px-4 py-3.5">
+              <div className="flex gap-1.5 items-center">
+                <span className="w-2 h-2 bg-[#5D8733] rounded-full animate-bounce [animation-delay:0ms]" />
+                <span className="w-2 h-2 bg-[#5D8733] rounded-full animate-bounce [animation-delay:150ms]" />
+                <span className="w-2 h-2 bg-[#5D8733] rounded-full animate-bounce [animation-delay:300ms]" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Error message */}
+        {error && (
+          <div className="flex gap-3">
+            <div className="w-8 h-8 rounded-full bg-red-100 border border-red-200 flex items-center justify-center flex-shrink-0">
+              <AlertTriangle size={14} className="text-red-500" />
+            </div>
+            <div className="bg-red-50 border border-red-200 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[78%]">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          </div>
+        )}
+
+        <div ref={bottomRef} />
       </div>
 
-      {/* Quick Prompts */}
+      {/* Quick Prompts — shown only before first message */}
       {messages.length === 0 && (
         <div className="px-4 pb-3 grid grid-cols-2 gap-2">
           {QUICK_PROMPTS.map((p) => (
             <button
               key={p.label}
               onClick={() => send(p.label)}
-              className="flex items-center gap-2 bg-white border border-[#C8E0A8] rounded-xl px-3 py-2.5 text-[#1B2A16] text-xs text-left hover:border-[#5D8733] transition-colors"
+              disabled={isLoading}
+              className="flex items-center gap-2 bg-white border border-[#C8E0A8] rounded-xl px-3 py-2.5 text-[#1B2A16] text-xs text-left hover:border-[#5D8733] transition-colors disabled:opacity-50"
             >
               <span className="text-[#5D8733]">{p.icon}</span>
               {p.label}
@@ -761,13 +750,15 @@ function ChatScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && send(input)}
+            onKeyDown={(e) => e.key === "Enter" && !isLoading && send(input)}
             placeholder="Ask about your finances..."
-            className="flex-1 bg-transparent text-[#1B2A16] text-sm placeholder-[#9DAD8F] outline-none"
+            disabled={isLoading}
+            className="flex-1 bg-transparent text-[#1B2A16] text-sm placeholder-[#9DAD8F] outline-none disabled:opacity-60"
           />
           <button
             onClick={() => send(input)}
-            className="w-8 h-8 rounded-full bg-[#5D8733] flex items-center justify-center flex-shrink-0"
+            disabled={isLoading || !input.trim()}
+            className="w-8 h-8 rounded-full bg-[#5D8733] flex items-center justify-center flex-shrink-0 disabled:opacity-40 transition-opacity"
           >
             <Send size={14} className="text-white" />
           </button>
@@ -1364,13 +1355,20 @@ export default function App() {
     setShowAllTxns(false);
   }
 
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[#D6E8B8] flex items-center justify-center">
+        <div className="w-full max-w-[420px] h-screen max-h-[900px] flex flex-col bg-[#F7F9EE] shadow-2xl">
+          <LoginScreen onSelect={handleSelect} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#D6E8B8] flex items-center justify-center">
-      {/* Phone shell */}
       <div className="w-full max-w-[420px] h-screen max-h-[900px] flex flex-col bg-[#F7F9EE] overflow-hidden relative shadow-2xl">
-        {!user ? (
-          <LoginScreen onSelect={handleSelect} />
-        ) : showAllTxns ? (
+        {showAllTxns ? (
           <AllTransactionsScreen user={user} onBack={() => setShowAllTxns(false)} />
         ) : (
           <>

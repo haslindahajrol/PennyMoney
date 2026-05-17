@@ -56,6 +56,11 @@ export function getFinancialSnapshot(userId) {
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 5);
 
+  // Income history (all records, oldest first)
+  const incomeHistory = (db.data.income || [])
+    .filter(i => i.user_id === userId)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
   // Saving goal progress
   const savingProgress = Math.round((user.saving_goal_saved / user.saving_goal_amount) * 100);
 
@@ -81,6 +86,7 @@ export function getFinancialSnapshot(userId) {
     budgetStatus,
     upcomingBills,
     recentTransactions,
+    incomeHistory,
     daysUntilPayday,
     savingProgress
   };
