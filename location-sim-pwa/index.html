@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kasi Location Sim</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#5D8733" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Kasi Sim" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #F7F9EE;
+      color: #1B2A16;
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+    header {
+      background: #5D8733;
+      color: white;
+      padding: 20px 16px 16px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 { font-size: 18px; font-weight: 700; }
+    header p  { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+    .content  { max-width: 480px; margin: 0 auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+
+    .card {
+      background: white;
+      border: 1.5px solid #C8E0A8;
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #5D8733; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px; flex-shrink: 0;
+    }
+    .user-name  { font-weight: 600; font-size: 15px; }
+    .user-loc   { font-size: 11px; color: #748A68; margin-top: 1px; font-family: monospace; }
+
+    .btn-home {
+      width: 100%;
+      padding: 9px;
+      border-radius: 12px;
+      border: 1.5px solid #C8E0A8;
+      background: white;
+      color: #748A68;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s;
+      margin-bottom: 10px;
+    }
+    .btn-home:hover  { border-color: #5D8733; color: #5D8733; }
+    .btn-home.active { background: #EEF3E3; border-color: #5D8733; color: #5D8733; }
+
+    .mall-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .btn-mall {
+      padding: 9px 10px;
+      border-radius: 12px;
+      border: 1.5px solid #C8E0A8;
+      background: white;
+      color: #748A68;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s;
+      text-align: left;
+    }
+    .btn-mall:hover  { border-color: #F59E0B; color: #92400E; background: #FFFBEB; }
+    .btn-mall.active { border-color: #F59E0B; color: #92400E; background: #FEF3C7; }
+    .btn-mall .dot   { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .btn-mall span   { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 99px;
+      margin-left: 4px;
+      font-weight: 600;
+    }
+    .badge-luxury { background: #FEF3C7; color: #92400E; }
+    .badge-mall   { background: #EEF3E3; color: #3A5C20; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1B2A16;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; }
+
+    footer { text-align: center; font-size: 11px; color: #9DAD8F; padding: 0 16px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📍 Kasi Location Sim</h1>
+  <p>Move users near malls to trigger proximity alerts</p>
+</header>
+
+<div class="content" id="app">
+  <p style="text-align:center;color:#748A68;font-size:13px;padding:20px 0">Loading...</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+  <p>Alerts fire within 5 km &nbsp;·&nbsp; App polls every 8 s</p>
+</footer>
+
+<script>
+  // Auto-detect the Kasi app host — works regardless of IP
+  const API = `http://${location.hostname}:3000`;
+
+  const USERS = [
+    { id: "user_001", name: "Mei Ling" },
+    { id: "user_002", name: "Jason" },
+    { id: "user_003", name: "Hakim" },
+    { id: "user_004", name: "Shoko" },
+  ];
+
+  let malls = [];
+  let locations = {}; // userId -> { live_lat, live_lng, home_lat, home_lng }
+  let busy = false;
+
+  async function init() {
+    try {
+      const [mallRes, ...locRes] = await Promise.all([
+        fetch(`${API}/api/malls`),
+        ...USERS.map(u => fetch(`${API}/api/location/${u.id}`)),
+      ]);
+      malls = await mallRes.json();
+      for (let i = 0; i < USERS.length; i++) {
+        locations[USERS[i].id] = await locRes[i].json();
+      }
+      render();
+    } catch (e) {
+      document.getElementById("app").innerHTML =
+        `<p style="color:red;text-align:center;padding:20px">Cannot reach Kasi app at ${API}<br>Make sure Next.js is running.</p>`;
+    }
+  }
+
+  async function moveTo(userId, lat, lng, label) {
+    if (busy) return;
+    busy = true;
+    try {
+      await fetch(`${API}/api/location/${userId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat, lng }),
+      });
+      locations[userId] = { ...locations[userId], live_lat: lat, live_lng: lng };
+      render();
+      showToast(`${USERS.find(u=>u.id===userId).name} moved to ${label}`);
+    } finally {
+      busy = false;
+    }
+  }
+
+  function isActive(userId, lat, lng) {
+    const loc = locations[userId];
+    if (!loc) return false;
+    return Math.abs(loc.live_lat - lat) < 0.0001 && Math.abs(loc.live_lng - lng) < 0.0001;
+  }
+
+  function render() {
+    const app = document.getElementById("app");
+    app.innerHTML = USERS.map(user => {
+      const loc = locations[user.id] || {};
+      const lat = loc.live_lat?.toFixed(4) ?? "—";
+      const lng = loc.live_lng?.toFixed(4) ?? "—";
+      const homeActive = isActive(user.id, loc.home_lat, loc.home_lng);
+
+      const mallBtns = malls.map(mall => {
+        const active = isActive(user.id, mall.lat, mall.lng);
+        const badge = mall.type === "luxury" ? "luxury" : "mall";
+        return `
+          <button class="btn-mall ${active ? "active" : ""}"
+            onclick="moveTo('${user.id}', ${mall.lat}, ${mall.lng}, '${mall.name}')">
+            <span class="dot"></span>
+            <span>${mall.name}<span class="badge badge-${badge}">${mall.type}</span></span>
+          </button>`;
+      }).join("");
+
+      return `
+        <div class="card">
+          <div class="card-header">
+            <div class="avatar">${user.name[0]}</div>
+            <div>
+              <div class="user-name">${user.name}</div>
+              <div class="user-loc">${lat}, ${lng}</div>
+            </div>
+          </div>
+          <button class="btn-home ${homeActive ? "active" : ""}"
+            onclick="moveTo('${user.id}', ${loc.home_lat}, ${loc.home_lng}, 'Home')">
+            🏠 At Home
+          </button>
+          <div class="mall-grid">${mallBtns}</div>
+        </div>`;
+    }).join("");
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = "✓ " + msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2000);
+  }
+
+  // Register service worker
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  }
+
+  init();
+</script>
+</body>
+</html>

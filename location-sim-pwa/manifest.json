@@ -1,0 +1,13 @@
+{
+  "name": "Kasi Location Sim",
+  "short_name": "Kasi Sim",
+  "description": "Simulate user live location for Kasi demo",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F9EE",
+  "theme_color": "#5D8733",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
