@@ -278,6 +278,7 @@ function HomeScreen({
   const [liveBalance, setLiveBalance] = useState<number | null>(null);
   const [nearbyMall, setNearbyMall] = useState<Mall | null>(null);
   const [alertDismissed, setAlertDismissed] = useState(false);
+  const [aiNudge, setAiNudge] = useState<string | null>(null);
   const [achievement, setAchievement] = useState<Achievement | null>(null);
   const [earnedAchievements, setEarnedAchievements] = useState<Achievement[]>([]);
   const [voucherCopied, setVoucherCopied] = useState(false);
@@ -370,6 +371,22 @@ function HomeScreen({
     return () => clearInterval(interval);
   }, [user.id]);
 
+  // Poll AI location nudge when user is near a mall; AI message takes priority over hardcoded text
+  useEffect(() => {
+    if (!nearbyMall || alertDismissed) return;
+    fetch(`/api/nudge/${user.id}`)
+      .then((r) => r.json())
+      .then((data) => { if (data?.triggered && data?.message) setAiNudge(data.message); })
+      .catch(() => null);
+    const interval = setInterval(() => {
+      fetch(`/api/nudge/${user.id}`)
+        .then((r) => r.json())
+        .then((data) => { if (data?.triggered && data?.message) setAiNudge(data.message); })
+        .catch(() => null);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [nearbyMall, alertDismissed, user.id]);
+
   // Auto-refresh every 10 seconds to pick up bank webhook updates
   useEffect(() => {
     const interval = setInterval(() => {
@@ -433,18 +450,20 @@ function HomeScreen({
       </div>
     )}
     <div className="flex-1 overflow-y-auto bg-[#F7F9EE] px-4 pt-6 pb-4 space-y-4">
-      {/* Proximity Alert */}
+      {/* Proximity Alert — AI-generated message takes priority over hardcoded fallback */}
       {nearbyMall && !alertDismissed && (
         <div className="mx-0 -mt-2 bg-amber-50 border border-amber-300 rounded-2xl px-4 py-3 flex items-start gap-3">
           <AlertTriangle size={18} className="text-amber-500 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-amber-800 text-sm font-semibold">Heads up, {user.name.split(" ")[0]}!</p>
             <p className="text-amber-700 text-xs mt-0.5">
-              You&apos;re near <span className="font-semibold">{nearbyMall.name}</span>. Your safe-to-spend is{" "}
-              <span className="font-semibold">{fmt(liveBalance ?? user.available)}</span> — stay mindful!
+              {aiNudge ?? (
+                <>You&apos;re near <span className="font-semibold">{nearbyMall.name}</span>. Your safe-to-spend is{" "}
+                <span className="font-semibold">{fmt(liveBalance ?? user.available)}</span> — stay mindful!</>
+              )}
             </p>
           </div>
-          <button onClick={() => setAlertDismissed(true)} className="text-amber-400 hover:text-amber-600 text-lg leading-none">✕</button>
+          <button onClick={() => { setAlertDismissed(true); setAiNudge(null); }} className="text-amber-400 hover:text-amber-600 text-lg leading-none">✕</button>
         </div>
       )}
       {/* Header */}

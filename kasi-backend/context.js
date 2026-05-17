@@ -92,3 +92,53 @@ export function getFinancialSnapshot(userId) {
   };
 }
 
+// Format snapshot as readable text block for AI prompts
+export function formatSnapshotForAI(snapshot) {
+  const { user, account, budgetStatus, upcomingBills, daysUntilPayday, savingProgress } = snapshot;
+
+  const budgetLines = budgetStatus.map(b =>
+    `  - ${b.category}: RM${b.spent} / RM${b.limit} (${b.percentage}%)${b.over ? ' ⚠️ OVER BUDGET' : ''}`
+  ).join('\n');
+
+  const billLines = upcomingBills.length
+    ? upcomingBills.map(b => `  - ${b.name}: RM${b.amount} due ${b.due_date}`).join('\n')
+    : '  None in next 7 days';
+
+  return `
+Balance: RM${account.balance}
+Safe to spend: RM${account.safe_to_spend}
+Days until payday: ${daysUntilPayday ?? 'unknown'}
+Saving goal: ${user.saving_goal} — ${savingProgress}% saved (RM${user.saving_goal_saved} / RM${user.saving_goal_amount})
+
+Budget status:
+${budgetLines}
+
+Upcoming bills:
+${billLines}
+`.trim();
+}
+
+// Check which financial conditions should trigger a proactive nudge
+export function checkNudgeTriggers(snapshot) {
+  const triggers = [];
+  const { account, budgetStatus, upcomingBills, daysUntilPayday } = snapshot;
+
+  if (account.safe_to_spend < 50) {
+    triggers.push({ type: 'low_safe_to_spend', message: `Safe-to-spend is critically low at RM${account.safe_to_spend}` });
+  }
+
+  budgetStatus.forEach(b => {
+    if (b.over) {
+      triggers.push({ type: 'over_budget', message: `${b.category} is over budget by RM${(b.spent - b.limit).toFixed(2)}` });
+    } else if (b.percentage >= 80) {
+      triggers.push({ type: 'near_budget_limit', message: `${b.category} is at ${b.percentage}% of budget` });
+    }
+  });
+
+  if (upcomingBills.length > 0 && daysUntilPayday !== null && daysUntilPayday <= 3) {
+    triggers.push({ type: 'bills_near_payday', message: `${upcomingBills.length} bill(s) due in the next 7 days and payday is in ${daysUntilPayday} day(s)` });
+  }
+
+  return triggers;
+}
+

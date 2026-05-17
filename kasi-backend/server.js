@@ -32,16 +32,15 @@ app.get('/dashboard/:userId', async (req, res) => {
   await db.read();
   const { userId } = req.params;
   const snapshot = getFinancialSnapshot(userId);
-  
+
   if (!snapshot) {
     return res.status(404).json({ error: 'User not found' });
   }
-  
+
   res.json(snapshot);
 });
 
 // ── POST /webhook/bank ────────────────────────────────────────────────────────
-// The dummy bank fires here on every new transaction or balance change
 app.post("/webhook/bank", async (req, res) => {
   const { event, data } = req.body;
   if (!event || !data) return res.status(400).json({ error: "invalid payload" });
@@ -113,7 +112,6 @@ app.post("/webhook/bank", async (req, res) => {
 });
 
 // ── GET /sync/:userId ─────────────────────────────────────────────────────────
-// Manual sync — pulls latest data from the bank's REST API
 app.get("/sync/:userId", async (req, res) => {
   const { userId } = req.params;
   try {
@@ -167,9 +165,7 @@ app.get("/sync/:userId", async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 // ── GET /transactions/:userId ─────────────────────────────────────────────────
-// Returns all transactions for a user, sorted oldest-first for AI analysis
 app.get('/transactions/:userId', (req, res) => {
   const { userId } = req.params;
   const txns = db.data.transactions
@@ -204,8 +200,9 @@ app.get('/income/:userId', (req, res) => {
     .filter(i => i.user_id === userId)
     .sort((a, b) => a.date.localeCompare(b.date));
   res.json(income);
-=======
-// ── DEMO: Set simulated location ─────────────────────────────
+});
+
+// ── DEMO: Set simulated location ──────────────────────────────────────────────
 app.post('/demo/location', async (req, res) => {
   const { userId, lat, lng } = req.body;
   if (!userId || lat === undefined || lng === undefined) {
@@ -217,14 +214,14 @@ app.post('/demo/location', async (req, res) => {
   res.json({ success: true, location_updated: { lat, lng }, notification: result });
 });
 
-// ── DEMO: Poll for nudge ──────────────────────────────────────
+// ── GET /nudge/:userId ────────────────────────────────────────────────────────
 app.get('/nudge/:userId', async (req, res) => {
   const { userId } = req.params;
   const result = await checkUserLocation(userId);
   res.json(result);
 });
 
-// ── DEMO: Reset location back to home ────────────────────────
+// ── POST /demo/reset/:userId ──────────────────────────────────────────────────
 app.post('/demo/reset/:userId', async (req, res) => {
   const { userId } = req.params;
   await db.read();
@@ -234,7 +231,6 @@ app.post('/demo/reset/:userId', async (req, res) => {
   user.live_lng = user.home_lng;
   await db.write();
   res.json({ success: true, message: `${user.name} location reset to home` });
->>>>>>> 02a04051177b37b13962435822367e445fcfe246
 });
 
 app.listen(PORT, () => {
