@@ -199,8 +199,8 @@ function LoginScreen({ onSelect }: { onSelect: (user: (typeof TEST_USERS)[0]) =>
     <div className="flex flex-col flex-1 bg-[#F7F9EE]">
       {/* Header */}
       <div className="bg-gradient-to-b from-[#7AAD47] to-[#5D8733] rounded-b-3xl px-6 pt-14 pb-10 flex flex-col items-center">
-        <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mb-4">
-          <Wallet size={28} className="text-white" />
+        <div className="w-20 h-20 rounded-full overflow-hidden mb-4 shadow-lg">
+          <img src="/PennyLogo.jpeg" alt="Penny" className="w-full h-full object-cover" />
         </div>
         <h1 className="text-white text-2xl font-bold">Penny</h1>
         <p className="text-white/80 text-sm mt-1">Tap an account to get started</p>
@@ -794,8 +794,8 @@ function ChatScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
     <div className="flex-1 flex flex-col bg-[#F7F9EE] overflow-hidden">
       {/* Header */}
       <div className="px-4 pt-6 pb-4 flex items-center gap-3 border-b border-[#C8E0A8] bg-white">
-        <div className="w-10 h-10 rounded-full bg-[#5D8733] flex items-center justify-center">
-          <MessageSquare size={18} className="text-white" />
+        <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+          <img src="/PennyChatPfp.jpeg" alt="Penny" className="w-full h-full object-cover" />
         </div>
         <div>
           <p className="text-[#1B2A16] font-semibold">Penny</p>
@@ -810,8 +810,8 @@ function ChatScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {/* Greeting */}
         <div className="flex gap-3">
-          <div className="w-8 h-8 rounded-full bg-[#EEF3E3] border border-[#C8E0A8] flex items-center justify-center flex-shrink-0">
-            <span className="text-[#5D8733] text-xs font-bold">P</span>
+          <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+            <img src="/PennyChatPfp.jpeg" alt="Penny" className="w-full h-full object-cover" />
           </div>
           <div className="bg-white border border-[#C8E0A8] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[78%]">
             <p className="text-[#1B2A16] text-sm">
@@ -824,8 +824,8 @@ function ChatScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
             {msg.role === "ai" && (
-              <div className="w-8 h-8 rounded-full bg-[#EEF3E3] border border-[#C8E0A8] flex items-center justify-center flex-shrink-0">
-                <span className="text-[#5D8733] text-xs font-bold">P</span>
+              <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                <img src="/PennyChatPfp.jpeg" alt="Penny" className="w-full h-full object-cover" />
               </div>
             )}
             <div
@@ -843,8 +843,8 @@ function ChatScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
         {/* Typing indicator */}
         {isLoading && (
           <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#EEF3E3] border border-[#C8E0A8] flex items-center justify-center flex-shrink-0">
-              <span className="text-[#5D8733] text-xs font-bold">P</span>
+            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+              <img src="/PennyChatPfp.jpeg" alt="Penny" className="w-full h-full object-cover" />
             </div>
             <div className="bg-white border border-[#C8E0A8] rounded-2xl rounded-tl-sm px-4 py-3.5">
               <div className="flex gap-1.5 items-center">

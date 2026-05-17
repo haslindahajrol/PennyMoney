@@ -92,7 +92,7 @@
     {
       "id": "acc_004",
       "user_id": "user_004",
-      "balance": 291,
+      "balance": 299,
       "safe_to_spend": 47
     }
   ],
@@ -211,6 +211,24 @@
     }
   ],
   "transactions": [
+    {
+      "id": "txn_1779025066909_jms9",
+      "user_id": "user_004",
+      "date": "2026-05-17",
+      "merchant": "Added",
+      "amount": 10,
+      "category": "credit_card",
+      "type": "credit"
+    },
+    {
+      "id": "txn_1779025031865_wuyb",
+      "user_id": "user_004",
+      "date": "2026-05-17",
+      "merchant": "Yogurt",
+      "amount": 2,
+      "category": "food",
+      "type": "debit"
+    },
     {
       "id": "txn_1779020218255_2h4m",
       "user_id": "user_004",
@@ -3771,8 +3789,8 @@
       "description": "You bought a meal! Taking care of yourself is the most important thing.",
       "voucher_code": "PENNY-EATS-2024",
       "voucher_desc": "RM 3 off your next Grab Food order",
-      "earned_at": "2026-05-17",
-      "seen": true
+      "earned_at": null,
+      "seen": false
     },
     {
       "id": "ach_ml_piggy_boss",
