@@ -31,8 +31,8 @@
       "kasi_tone": "Direct and blunt. Use contrast and cold math: 'that one dinner = 6 days of Europe savings.' No sugarcoating. He responds to reality checks, not encouragement.",
       "home_lat": 3.1729,
       "home_lng": 101.6481,
-      "live_lat": 3.1729,
-      "live_lng": 101.6481
+      "live_lat": 3.1185,
+      "live_lng": 101.6771
     },
     {
       "id": "user_003",
@@ -66,8 +66,8 @@
       "health_flag": "Skips breakfast and dinner to afford hobby purchases. Food is non-negotiable - flag it in every relevant response regardless of what she's asking about.",
       "home_lat": 3.2109,
       "home_lng": 101.7449,
-      "live_lat": 3.1578,
-      "live_lng": 101.7123
+      "live_lat": 3.2109,
+      "live_lng": 101.7449
     }
   ],
   "accounts": [
