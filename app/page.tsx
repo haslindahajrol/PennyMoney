@@ -49,6 +49,7 @@ const TEST_USERS = [
   {
     id: "user_001",
     name: "Mei Ling",
+    avatar: "/mei-ling.jpg",
     role: "Full-time employee",
     balance: 1800,
     available: 700,
@@ -62,6 +63,7 @@ const TEST_USERS = [
   {
     id: "user_002",
     name: "Jason",
+    avatar: "/jason.jpg",
     role: "Full-time employee",
     balance: 3140,
     available: 480,
@@ -76,6 +78,7 @@ const TEST_USERS = [
   {
     id: "user_003",
     name: "Hakim",
+    avatar: "/hakim.jpg",
     role: "Freelancer, variable income",
     balance: 980,
     available: 130,
@@ -89,6 +92,7 @@ const TEST_USERS = [
   {
     id: "user_004",
     name: "Shoko",
+    avatar: "/shoko.jpg",
     role: "Full-time employee",
     balance: 312,
     available: 47,
@@ -216,8 +220,17 @@ function LoginScreen({ onSelect }: { onSelect: (user: (typeof TEST_USERS)[0]) =>
               className="w-full text-left p-4 rounded-2xl border border-[#C8E0A8] bg-white hover:border-[#5D8733] hover:bg-[#5D8733]/5 active:scale-[0.98] transition-all"
             >
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#EEF3E3] flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <User size={18} className="text-[#748A68]" />
+                <div className="w-10 h-10 rounded-full bg-[#EEF3E3] flex items-center justify-center flex-shrink-0 mt-0.5 overflow-hidden">
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      e.currentTarget.nextElementSibling?.removeAttribute("style");
+                    }}
+                  />
+                  <span style={{ display: "none" }} className="text-[#748A68] text-sm font-bold">{user.name[0]}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
@@ -457,10 +470,7 @@ function HomeScreen({
           <div className="flex-1">
             <p className="text-amber-800 text-sm font-semibold">Heads up, {user.name.split(" ")[0]}!</p>
             <p className="text-amber-700 text-xs mt-0.5">
-              {aiNudge ?? (
-                <>You&apos;re near <span className="font-semibold">{nearbyMall.name}</span>. Your safe-to-spend is{" "}
-                <span className="font-semibold">{fmt(liveBalance ?? user.available)}</span> — stay mindful!</>
-              )}
+              {aiNudge ?? <>Near <span className="font-semibold">{nearbyMall.name}</span> — you have <span className="font-semibold">{fmt(Math.max(0, (liveBalance ?? user.balance) - user.savings))}</span> safe to spend.</>}
             </p>
           </div>
           <button onClick={() => { setAlertDismissed(true); setAiNudge(null); }} className="text-amber-400 hover:text-amber-600 text-lg leading-none">✕</button>
@@ -476,8 +486,17 @@ function HomeScreen({
           <button onClick={onLogout} className="w-9 h-9 rounded-full bg-[#EEF3E3] flex items-center justify-center">
             <LogOut size={16} className="text-[#748A68]" />
           </button>
-          <div className="w-9 h-9 rounded-full bg-[#5D8733] flex items-center justify-center">
-            <span className="text-white text-sm font-bold">{user.name[0]}</span>
+          <div className="w-9 h-9 rounded-full bg-[#5D8733] flex items-center justify-center overflow-hidden">
+            <img
+              src={user.avatar}
+              alt={user.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+                e.currentTarget.nextElementSibling?.removeAttribute("style");
+              }}
+            />
+            <span style={{ display: "none" }} className="text-white text-sm font-bold">{user.name[0]}</span>
           </div>
         </div>
       </div>
@@ -1247,8 +1266,17 @@ function ProfileScreen({
 
       {/* User Card */}
       <div className="bg-white border border-[#C8E0A8] rounded-2xl p-4 flex items-center gap-4">
-        <div className="w-14 h-14 rounded-full bg-[#5D8733] flex items-center justify-center">
-          <span className="text-white text-xl font-bold">{user.name[0]}</span>
+        <div className="w-14 h-14 rounded-full bg-[#5D8733] flex items-center justify-center overflow-hidden">
+          <img
+            src={user.avatar}
+            alt={user.name}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+              e.currentTarget.nextElementSibling?.removeAttribute("style");
+            }}
+          />
+          <span style={{ display: "none" }} className="text-white text-xl font-bold">{user.name[0]}</span>
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">

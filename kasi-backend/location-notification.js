@@ -56,21 +56,15 @@ export async function generateLocationNudge(userId) {
 
   const { user, account, savingProgress } = snapshot;
 
-  const prompt = `You are Kasi, a financial companion. Write a SHORT, soft push notification (max 2 sentences) for ${user.name}.
-Tone: ${user.kasi_tone}
-They are currently outside their usual area at an unusual time.
-Their spending weakness: ${user.spending_weakness}
-Safe to spend: RM${account.safe_to_spend}
-Saving goal: ${user.saving_goal} (${savingProgress}% saved)
-Gently nudge them to stay mindful before spending. Be warm, no hashtags.`;
+  const prompt = `Write a 1-sentence spending reminder for ${user.name}. Tone: ${user.kasi_tone}. Must include their safe-to-spend (RM${account.safe_to_spend}). Their weakness: ${user.spending_weakness}. Max 15 words. No hashtags.`;
 
   try {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const result = await model.generateContent(prompt);
-    return result.response.text();
+    return result.response.text().trim();
   } catch (err) {
     console.error('[LocationNudge] Gemini error:', err);
-    return `Hey ${user.name}! You're out and about — remember your ${user.saving_goal} goal before spending 💸`;
+    return `You have RM${account.safe_to_spend} left to spend — keep it in check! 💸`;
   }
 }
 
