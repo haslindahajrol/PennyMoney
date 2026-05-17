@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import db from './db.js';
 import { getFinancialSnapshot } from './context.js';
+import { setSimulatedLocation, checkUserLocation } from './location-notification.js';
 
 dotenv.config();
 
@@ -154,6 +155,37 @@ app.get("/sync/:userId", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Bank unreachable. Is it running on port 4000?" });
   }
+});
+
+// ── DEMO: Set simulated location ─────────────────────────────
+app.post('/demo/location', async (req, res) => {
+  const { userId, lat, lng } = req.body;
+  if (!userId || lat === undefined || lng === undefined) {
+    return res.status(400).json({ error: 'userId, lat, and lng are required' });
+  }
+  const success = await setSimulatedLocation(userId, lat, lng);
+  if (!success) return res.status(404).json({ error: 'User not found' });
+  const result = await checkUserLocation(userId);
+  res.json({ success: true, location_updated: { lat, lng }, notification: result });
+});
+
+// ── DEMO: Poll for nudge ──────────────────────────────────────
+app.get('/nudge/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const result = await checkUserLocation(userId);
+  res.json(result);
+});
+
+// ── DEMO: Reset location back to home ────────────────────────
+app.post('/demo/reset/:userId', async (req, res) => {
+  const { userId } = req.params;
+  await db.read();
+  const user = db.data.users.find(u => u.id === userId);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  user.live_lat = user.home_lat;
+  user.live_lng = user.home_lng;
+  await db.write();
+  res.json({ success: true, message: `${user.name} location reset to home` });
 });
 
 app.listen(PORT, () => {
