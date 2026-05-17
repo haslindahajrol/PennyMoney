@@ -1,12 +1,18 @@
 import { NextResponse } from "next/server";
-import { getAccountForUser } from "@/lib/db-data";
+
+const KASI_URL = process.env.KASI_URL || "http://localhost:3001";
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ userId: string }> }
 ) {
   const { userId } = await params;
-  const account = getAccountForUser(userId);
-  if (!account) return NextResponse.json({ error: "Account not found" }, { status: 404 });
-  return NextResponse.json(account);
+  try {
+    const res = await fetch(`${KASI_URL}/dashboard/${userId}`);
+    if (!res.ok) return NextResponse.json({ error: "Account not found" }, { status: 404 });
+    const snapshot = await res.json();
+    return NextResponse.json(snapshot.account);
+  } catch {
+    return NextResponse.json({ error: "Backend unreachable" }, { status: 503 });
+  }
 }

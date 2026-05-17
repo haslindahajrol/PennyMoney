@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const API_URL = 'http://localhost:3001';
+const API_URL = `http://${window.location.hostname}:3001`;
 
 // Styles
 const styles = {
@@ -431,19 +431,23 @@ export default function App() {
   const [nudge, setNudge] = useState(null);
 
   useEffect(() => {
-    if (userId) {
-      // Fetch dashboard data
+    if (!userId) return;
+
+    function refresh() {
       fetch(`${API_URL}/dashboard/${userId}`)
         .then(res => res.json())
         .then(setDashboardData)
         .catch(console.error);
 
-      // Fetch nudge
       fetch(`${API_URL}/nudge/${userId}`)
         .then(res => res.json())
         .then(data => setNudge(data.nudge))
         .catch(console.error);
     }
+
+    refresh();
+    const interval = setInterval(refresh, 5000);
+    return () => clearInterval(interval);
   }, [userId]);
 
   const handleLogout = () => {

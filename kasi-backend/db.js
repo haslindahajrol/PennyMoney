@@ -601,6 +601,103 @@ const defaultData = {
     { id: "mall_005", name: "Mid Valley Megamall",     lat: 3.1178, lng: 101.6769, type: "mall" },
     { id: "mall_006", name: "1 Utama Shopping Centre", lat: 3.1503, lng: 101.6151, type: "mall" },
     { id: "mall_007", name: "Sunway Pyramid",          lat: 3.0733, lng: 101.6058, type: "mall" }
+  ],
+
+  achievements: [
+    // ── Mei Ling (user_001) ──────────────────────────────────────
+    {
+      id: "ach_ml_piggy_boss",
+      user_id: "user_001",
+      name: "Piggy Boss",
+      description: "You stashed away RM 1,100 in savings. Future you is already grateful.",
+      voucher_code: "PENNY-SAVE-ML",
+      voucher_desc: "RM 5 off your next Shopee order",
+      earned_at: "2026-05-01",
+      seen: true
+    },
+    {
+      id: "ach_ml_on_time",
+      user_id: "user_001",
+      name: "On Time, Always",
+      description: "Every bill paid before the due date. That's discipline money can't fake.",
+      voucher_code: "PENNY-TNG-ML",
+      voucher_desc: "RM 3 cashback on your next TnG reload",
+      earned_at: "2026-05-05",
+      seen: true
+    },
+    {
+      id: "ach_ml_eat_smart",
+      user_id: "user_001",
+      name: "Eat Smart",
+      description: "Kept food spending balanced this month. Your body and wallet thank you.",
+      voucher_code: "PENNY-GRAB-ML",
+      voucher_desc: "Free Grab Food delivery (up to RM 5)",
+      earned_at: "2026-05-10",
+      seen: true
+    },
+    // ── Jason (user_002) — one, as deserved ──────────────────────
+    {
+      id: "ach_j_big_fish",
+      user_id: "user_002",
+      name: "Big Fish",
+      description: "RM 380 at Nobu KL in one sitting. Living your best life. No notes.",
+      voucher_code: "PENNY-NOBU-J",
+      voucher_desc: "RM 10 off at OpenRice partner restaurants",
+      earned_at: "2026-05-15",
+      seen: true
+    },
+    // ── Hakim (user_003) ─────────────────────────────────────────
+    {
+      id: "ach_h_tool_up",
+      user_id: "user_003",
+      name: "Tool Up",
+      description: "Invested in your craft. Every great freelancer starts with the right gear.",
+      voucher_code: "PENNY-GEAR-HAK",
+      voucher_desc: "RM 10 off at Harvey Norman online",
+      earned_at: "2026-05-08",
+      seen: true
+    },
+    {
+      id: "ach_h_hustle_mode",
+      user_id: "user_003",
+      name: "Hustle Mode",
+      description: "Variable income, unshakeable grind. You're building something real.",
+      voucher_code: "PENNY-CANVA-HAK",
+      voucher_desc: "1 month free Canva Pro trial",
+      earned_at: "2026-05-12",
+      seen: true
+    },
+    // ── Shoko (user_004) ─────────────────────────────────────────
+    {
+      id: "ach_s_me_first",
+      user_id: "user_004",
+      name: "Me First!",
+      description: "You bought a meal! Taking care of yourself is the most important thing.",
+      voucher_code: "PENNY-EATS-2024",
+      voucher_desc: "RM 3 off your next Grab Food order",
+      earned_at: null,
+      seen: false
+    },
+    {
+      id: "ach_s_dorm_life",
+      user_id: "user_004",
+      name: "Dorm Survivor",
+      description: "Paid your dorm fees on time. Adulting level 1: unlocked.",
+      voucher_code: "PENNY-MART-SK",
+      voucher_desc: "RM 5 off at Grab Mart",
+      earned_at: "2026-05-01",
+      seen: true
+    },
+    {
+      id: "ach_s_night_owl",
+      user_id: "user_004",
+      name: "Night Owl",
+      description: "Checking Penny past midnight? That's financial awareness. Respect.",
+      voucher_code: "PENNY-TEA-SK",
+      voucher_desc: "Free bubble tea at Tealive (M size)",
+      earned_at: "2026-05-14",
+      seen: true
+    }
   ]
 };
 
@@ -650,6 +747,20 @@ if (!db.data) {
     }
     return u;
   });
+
+  if (!db.data.achievements) {
+    db.data.achievements = defaultData.achievements;
+    dirty = true;
+  } else {
+    // Seed any new achievements that don't yet exist in the file
+    const existingIds = new Set(db.data.achievements.map(a => a.id));
+    for (const ach of defaultData.achievements) {
+      if (!existingIds.has(ach.id)) {
+        db.data.achievements.push(ach);
+        dirty = true;
+      }
+    }
+  }
 
   if (dirty) await db.write();
 }

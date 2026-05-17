@@ -50,6 +50,15 @@ export async function POST(req: Request) {
       account.balance = data.account.balance;
     }
 
+    // Grant "Me First!" achievement when Shoko spends on food
+    if (transaction.user_id === 'user_004' && transaction.category === 'food') {
+      const ach = (db.achievements ?? []).find((a: { id: string }) => a.id === 'ach_s_me_first');
+      if (ach && !ach.earned_at) {
+        ach.earned_at = transaction.date;
+        ach.seen = false;
+      }
+    }
+
     writeDb(db);
     console.log(`[WEBHOOK] Synced: ${transaction.merchant} -RM${transaction.amount} for ${transaction.user_id}`);
   }

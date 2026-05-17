@@ -50,8 +50,8 @@ const TEST_USERS = [
     id: "user_001",
     name: "Mei Ling",
     role: "Full-time employee",
-    balance: 1820,
-    available: 2147.5,
+    balance: 1800,
+    available: 700,
     savings: 1100,
     monthlyIncome: 2500,
     payday: 28,
@@ -64,7 +64,7 @@ const TEST_USERS = [
     name: "Jason",
     role: "Full-time employee",
     balance: 3140,
-    available: 3140,
+    available: 480,
     savings: 500,
     monthlyIncome: 6000,
     payday: 25,
@@ -78,7 +78,7 @@ const TEST_USERS = [
     name: "Hakim",
     role: "Freelancer, variable income",
     balance: 980,
-    available: 980,
+    available: 130,
     savings: 200,
     monthlyIncome: 2200,
     payday: null,
@@ -91,7 +91,7 @@ const TEST_USERS = [
     name: "Shoko",
     role: "Full-time employee",
     balance: 312,
-    available: 312,
+    available: 47,
     savings: 80,
     monthlyIncome: 1300,
     payday: 1,
@@ -103,6 +103,7 @@ const TEST_USERS = [
 
 type Bill = { id: string; user_id: string; name: string; amount: number; due_date: string; recurring: boolean };
 type Transaction = { id: string; user_id: string; date: string; merchant: string; amount: number; category: string; type: "credit" | "debit" };
+type Achievement = { id: string; name: string; description: string; voucher_code: string; voucher_desc: string; earned_at: string; seen: boolean };
 
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -238,6 +239,9 @@ function LoginScreen({ onSelect }: { onSelect: (user: (typeof TEST_USERS)[0]) =>
           ))}
         </div>
       </div>
+      <div className="pb-4 text-center">
+        <a href="/demo.html" className="text-[#C8E0A8] text-[10px] hover:text-[#748A68]">⚙ demo controls</a>
+      </div>
     </div>
   );
 }
@@ -274,6 +278,47 @@ function HomeScreen({
   const [liveBalance, setLiveBalance] = useState<number | null>(null);
   const [nearbyMall, setNearbyMall] = useState<Mall | null>(null);
   const [alertDismissed, setAlertDismissed] = useState(false);
+  const [achievement, setAchievement] = useState<Achievement | null>(null);
+  const [earnedAchievements, setEarnedAchievements] = useState<Achievement[]>([]);
+  const [voucherCopied, setVoucherCopied] = useState(false);
+  const [copiedVoucherId, setCopiedVoucherId] = useState<string | null>(null);
+
+  useEffect(() => {
+    function checkAchievements() {
+      fetch(`/api/achievements/${user.id}`)
+        .then((r) => r.json())
+        .then((list: Achievement[]) => {
+          setEarnedAchievements(list);
+          const unseen = list.find((a) => !a.seen);
+          if (unseen) setAchievement((prev) => prev ?? unseen);
+        })
+        .catch(() => null);
+    }
+    checkAchievements();
+    const interval = setInterval(checkAchievements, 4000);
+    return () => clearInterval(interval);
+  }, [user.id]);
+
+  function dismissAchievement() {
+    if (!achievement) return;
+    fetch(`/api/achievements/${user.id}/${achievement.id}/seen`, { method: "POST" }).catch(() => null);
+    setAchievement(null);
+    setVoucherCopied(false);
+  }
+
+  function copyVoucher(code: string) {
+    navigator.clipboard.writeText(code).then(() => {
+      setVoucherCopied(true);
+      setTimeout(() => setVoucherCopied(false), 2000);
+    });
+  }
+
+  function copyVoucherById(id: string, code: string) {
+    navigator.clipboard.writeText(code).then(() => {
+      setCopiedVoucherId(id);
+      setTimeout(() => setCopiedVoucherId(null), 2000);
+    });
+  }
 
   useEffect(() => {
     setLoadingBills(true);
@@ -294,7 +339,9 @@ function HomeScreen({
   useEffect(() => {
     fetch(`/api/accounts/${user.id}`)
       .then((r) => r.json())
-      .then((data) => { if (data?.balance !== undefined) setLiveBalance(data.balance); });
+      .then((data) => {
+        if (data?.balance !== undefined) setLiveBalance(data.balance);
+      });
   }, [user.id]);
 
   // Check proximity to malls every 8 seconds
@@ -335,12 +382,56 @@ function HomeScreen({
         .then((data) => setBills(data));
       fetch(`/api/accounts/${user.id}`)
         .then((r) => r.json())
-        .then((data) => { if (data?.balance !== undefined) setLiveBalance(data.balance); });
+        .then((data) => {
+          if (data?.balance !== undefined) setLiveBalance(data.balance);
+        });
     }, 10000);
     return () => clearInterval(interval);
   }, [user.id]);
 
   return (
+    <>
+    {/* Achievement Modal */}
+    {achievement && (
+      <div className="absolute inset-0 z-50 flex items-end justify-center pb-6 px-4 bg-black/50 backdrop-blur-sm">
+        <div className="bg-white rounded-3xl p-6 shadow-2xl w-full max-w-[360px]">
+          <div className="text-center mb-4">
+            <span className="text-4xl">🎉</span>
+            <p className="text-[#748A68] text-[10px] uppercase tracking-widest font-semibold mt-1">Achievement Unlocked</p>
+          </div>
+          <div className="flex justify-center mb-4">
+            <div className="bg-gradient-to-br from-[#7AAD47] to-[#3A5C20] rounded-2xl px-8 py-4 flex flex-col items-center gap-2 shadow-lg">
+              <span className="text-3xl">🏅</span>
+              <span className="text-white font-bold text-lg tracking-wide">{achievement.name}</span>
+              <span className="text-white/80 text-xs text-center">{achievement.description}</span>
+            </div>
+          </div>
+          <p className="text-[#1B2A16] text-sm text-center mb-4 leading-relaxed">
+            Yes Shoko! You actually bought a proper meal — that&apos;s the most important thing.
+            Your body thanks you. Keep feeding yourself first, always.
+          </p>
+          <div className="bg-[#EEF3E3] border border-dashed border-[#5D8733] rounded-2xl p-4 mb-4">
+            <p className="text-[#748A68] text-[10px] uppercase tracking-wider mb-1">Your Reward</p>
+            <p className="text-[#1B2A16] font-semibold text-sm mb-2">{achievement.voucher_desc}</p>
+            <div className="bg-white rounded-xl px-3 py-2 flex items-center justify-between gap-2">
+              <span className="text-[#5D8733] font-bold text-sm tracking-widest">{achievement.voucher_code}</span>
+              <button
+                onClick={() => copyVoucher(achievement.voucher_code)}
+                className="text-xs text-[#748A68] hover:text-[#5D8733] font-medium shrink-0"
+              >
+                {voucherCopied ? "Copied!" : "Copy"}
+              </button>
+            </div>
+          </div>
+          <button
+            onClick={dismissAchievement}
+            className="w-full bg-[#5D8733] text-white rounded-2xl py-3 font-semibold text-sm active:scale-[0.98] transition-transform"
+          >
+            Awesome, thanks!
+          </button>
+        </div>
+      </div>
+    )}
     <div className="flex-1 overflow-y-auto bg-[#F7F9EE] px-4 pt-6 pb-4 space-y-4">
       {/* Proximity Alert */}
       {nearbyMall && !alertDismissed && (
@@ -372,13 +463,30 @@ function HomeScreen({
         </div>
       </div>
 
+      {/* Achievement Badges */}
+      {earnedAchievements.length > 0 && (
+        <div className="bg-white border border-[#C8E0A8] rounded-2xl p-4">
+          <p className="text-[#748A68] text-xs uppercase tracking-wider mb-3">Achievements</p>
+          <div className="flex gap-4 flex-wrap">
+            {earnedAchievements.map((ach) => (
+              <div key={ach.id} className="flex flex-col items-center gap-1.5">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#7AAD47] to-[#3A5C20] flex items-center justify-center shadow-md">
+                  <span className="text-2xl">🏅</span>
+                </div>
+                <span className="text-[#1B2A16] text-[10px] font-semibold text-center leading-tight max-w-[56px]">{ach.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Balance Cards */}
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-white border border-[#C8E0A8] rounded-2xl p-4">
           <div className="flex items-center gap-1.5 text-[#748A68] text-xs mb-2">
-            <CreditCard size={12} /> Available
+            <CreditCard size={12} /> Safe to spend
           </div>
-          <p className="text-[#1B2A16] text-xl font-bold">{fmt(liveBalance ?? user.available)}</p>
+          <p className="text-[#1B2A16] text-xl font-bold">{fmt(Math.max(0, (liveBalance ?? user.balance) - user.savings))}</p>
         </div>
         <div className="bg-white border border-[#5D8733]/30 rounded-2xl p-4">
           <div className="flex items-center gap-1.5 text-[#748A68] text-xs mb-2">
@@ -507,7 +615,35 @@ function HomeScreen({
         )}
       </div>
 
+      {/* Vouchers */}
+      {earnedAchievements.length > 0 && (
+        <div className="bg-white border border-[#C8E0A8] rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-sm">🎟️</span>
+            <span className="text-[#1B2A16] font-semibold text-sm">My Vouchers</span>
+          </div>
+          <div className="space-y-3">
+            {earnedAchievements.map((ach) => (
+              <div key={ach.id} className="bg-[#EEF3E3] border border-dashed border-[#5D8733] rounded-xl p-3">
+                <p className="text-[#748A68] text-[10px] uppercase tracking-wider mb-0.5">{ach.name}</p>
+                <p className="text-[#1B2A16] font-semibold text-sm mb-2">{ach.voucher_desc}</p>
+                <div className="bg-white rounded-lg px-3 py-1.5 flex items-center justify-between gap-2">
+                  <span className="text-[#5D8733] font-bold text-sm tracking-widest">{ach.voucher_code}</span>
+                  <button
+                    onClick={() => copyVoucherById(ach.id, ach.voucher_code)}
+                    className="text-xs text-[#748A68] hover:text-[#5D8733] font-medium shrink-0"
+                  >
+                    {copiedVoucherId === ach.id ? "Copied!" : "Copy"}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
     </div>
+    </>
   );
 }
 
@@ -535,6 +671,7 @@ function WalletScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
   }, [user.id]);
 
   const balance = liveBalance ?? user.balance;
+  const safeToSpend = Math.max(0, balance - user.savings);
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#F7F9EE] px-4 pt-6 pb-4 space-y-4">
@@ -556,6 +693,14 @@ function WalletScreen({ user }: { user: (typeof TEST_USERS)[0] }) {
         ) : (
           <p className="text-[#1B2A16] text-3xl font-bold">{fmt(balance)}</p>
         )}
+        <div className="mt-2 pt-2 border-t border-[#EEF3E3] flex items-center justify-between">
+          <span className="text-[#748A68] text-xs">Safe to spend</span>
+          {loading ? (
+            <div className="h-3 w-16 bg-[#EEF3E3] rounded animate-pulse" />
+          ) : (
+            <span className="text-[#5D8733] text-sm font-semibold">{fmt(safeToSpend)}</span>
+          )}
+        </div>
       </div>
 
       {/* Linked Bank Card */}
@@ -1064,6 +1209,14 @@ function ProfileScreen({
 }) {
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const [liveBalance, setLiveBalance] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/accounts/${user.id}`)
+      .then((r) => r.json())
+      .then((data) => { if (data?.balance !== undefined) setLiveBalance(data.balance); })
+      .catch(() => null);
+  }, [user.id]);
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#F7F9EE] px-4 pt-6 pb-4 space-y-4">
@@ -1109,7 +1262,7 @@ function ProfileScreen({
             {
               icon: <CreditCard size={16} className="text-blue-500" />,
               label: "Current Balance",
-              value: `RM ${user.balance.toLocaleString()}`,
+              value: liveBalance !== null ? `RM ${liveBalance.toLocaleString()}` : `RM ${user.balance.toLocaleString()}`,
               color: "bg-blue-50",
             },
           ].map((item) => (

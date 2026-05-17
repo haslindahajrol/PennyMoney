@@ -2,6 +2,10 @@ import fs from "fs";
 import path from "path";
 
 type DbBill = { id: string; user_id: string; name: string; amount: number; due_date: string; recurring: boolean };
+type DbAchievement = {
+  id: string; user_id: string; name: string; description: string;
+  voucher_code: string; voucher_desc: string; earned_at: string | null; seen: boolean;
+};
 
 // Mirrors the defaultData in kasi-backend/db.js
 const DEFAULT_BILLS = [
@@ -71,6 +75,37 @@ export function deleteBillForUser(userId: string, billId: string): boolean {
   if (db.bills.length === before) return false;
   fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
   return true;
+}
+
+export function getAchievementsForUser(userId: string): DbAchievement[] {
+  const db = readDb();
+  const achievements: DbAchievement[] = db?.achievements ?? [];
+  return achievements.filter((a) => a.user_id === userId && a.earned_at != null);
+}
+
+export function resetAchievement(achievementId: string): void {
+  const dbPath = path.join(process.cwd(), "kasi-backend", "db.json");
+  const db = readDb();
+  if (!db?.achievements) return;
+  const ach = db.achievements.find((a: DbAchievement) => a.id === achievementId);
+  if (ach) {
+    ach.seen = false;
+    ach.earned_at = null;
+    fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
+  }
+}
+
+export function markAchievementSeen(userId: string, achievementId: string): void {
+  const dbPath = path.join(process.cwd(), "kasi-backend", "db.json");
+  const db = readDb();
+  if (!db?.achievements) return;
+  const ach = db.achievements.find(
+    (a: DbAchievement) => a.id === achievementId && a.user_id === userId
+  );
+  if (ach) {
+    ach.seen = true;
+    fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
+  }
 }
 
 export function getAccountForUser(userId: string) {

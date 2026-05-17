@@ -27,7 +27,8 @@ app.get('/users', (req, res) => {
 });
 
 // Get dashboard data for a user
-app.get('/dashboard/:userId', (req, res) => {
+app.get('/dashboard/:userId', async (req, res) => {
+  await db.read();
   const { userId } = req.params;
   const snapshot = getFinancialSnapshot(userId);
   
@@ -74,6 +75,15 @@ app.post("/webhook/bank", async (req, res) => {
       account.safe_to_spend = Math.max(0,
         parseFloat((account.balance - totalBills).toFixed(2))
       );
+    }
+
+    // Auto-grant "Me First!" achievement when Shoko buys food
+    if (transaction.user_id === 'user_004' && transaction.category === 'food') {
+      const ach = (db.data.achievements || []).find(a => a.id === 'ach_s_me_first');
+      if (ach && !ach.earned_at) {
+        ach.earned_at = transaction.date;
+        ach.seen = false;
+      }
     }
 
     await db.write();
@@ -164,6 +174,25 @@ app.get('/transactions/:userId', (req, res) => {
     .filter(t => t.user_id === userId)
     .sort((a, b) => a.date.localeCompare(b.date));
   res.json(txns);
+});
+
+// ── GET /achievements/:userId ─────────────────────────────────────────────────
+app.get('/achievements/:userId', (req, res) => {
+  const { userId } = req.params;
+  const achievements = (db.data.achievements || []).filter(a => a.user_id === userId);
+  res.json(achievements);
+});
+
+// ── POST /achievements/:userId/:achievementId/seen ────────────────────────────
+app.post('/achievements/:userId/:achievementId/seen', async (req, res) => {
+  const { userId, achievementId } = req.params;
+  await db.read();
+  const ach = (db.data.achievements || []).find(a => a.id === achievementId && a.user_id === userId);
+  if (ach) {
+    ach.seen = true;
+    await db.write();
+  }
+  res.json({ ok: true });
 });
 
 // ── GET /income/:userId ───────────────────────────────────────────────────────

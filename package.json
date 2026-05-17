@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"next dev -H 0.0.0.0\" \"npm --prefix kasi-backend start\" \"npm --prefix location-sim-pwa start\"",
+    "dev": "concurrently \"next dev -H 0.0.0.0\" \"npm --prefix kasi-backend start\" \"npm --prefix location-sim-pwa start\" \"npm --prefix kasi-frontend run dev\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint ."
